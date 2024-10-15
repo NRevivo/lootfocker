@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Foot Locker Israel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="homepage.js"></script>
+</head>
+<body>
+    <header class="sticky-header">
+        <nav>
+            <div class="logo">Loot Focker</div>
+            <ul class="nav-links">
+                <li><a href="#">Men</a></li>
+                <li><a href="#">Women</a></li>
+                <li><a href="#">Kids</a></li>
+                <li><a href="#">New Arrivals</a></li>
+                <li><a href="#">Sale</a></li>
+            </ul>
+            <div class="login-register">
+                <a href="#">Login/Register</a>
+            </div>            
+            <div class="shopping-cart">
+                <img src="cart-icon.png" alt="Shopping Cart">
+                <span class="cart-count">0</span>
+            </div>
+            <div class="hamburger">
+                <div class="line"></div>
+                <div class="line"></div>
+                <div class="line"></div>
+            </div>
+        </nav>
+    </header>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Login</h2>
+            <form>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="cta-button">Login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
+    <main>
+        <section class="hero-carousel">
+            <!-- Existing carousel slides -->
+            <div class="carousel-slide active">
+                <img src="./banner1.jpg" alt="New Arrivals">
+                <div class="carousel-content">
+                    <h1>New Arrivals</h1>
+                    <p>Check out the latest styles</p>
+                    <a href="#" class="cta-button">Shop Now</a>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <img src="/Users/noamrevivo/Desktop/lootfocker/images/banner_fall_web3.jpg.webp" alt="Summer Sale">
+                <div class="carousel-content">
+                    <h1>Summer Sale</h1>
+                    <p>Up to 50% off on selected items</p>
+                    <a href="#" class="cta-button">Shop Sale</a>
+                </div>
+            </div>
+            <!-- New Sales Banner -->
+            <div class="carousel-slide">
+                <img src="/Users/noamrevivo/Desktop/lootfocker/images/banner_fall_web3.jpg.webp" alt="Fall Collection Sale">
+                <div class="carousel-content">
+                    <h1>Fall Collection Sale</h1>
+                    <p>Don't miss out on the new fall styles</p>
+                    <a href="#" class="cta-button">Shop Fall Collection</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="featured-products">
+            <h2>Featured Products</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x300?text=Product+1" alt="Product 1">
+                    <img src="https://via.placeholder.com/300x300?text=Product+1+Alt" alt="Product 1 Alternative" class="hover-image">
+                    <h3>Product 1</h3>
+                    <p class="price">₪299.99</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x300?text=Product+2" alt="Product 2">
+                    <img src="https://via.placeholder.com/300x300?text=Product+2+Alt" alt="Product 2 Alternative" class="hover-image">
+                    <h3>Product 2</h3>
+                    <p class="price">₪249.99</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x300?text=Product+3" alt="Product 3">
+                    <img src="https://via.placeholder.com/300x300?text=Product+3+Alt" alt="Product 3 Alternative" class="hover-image">
+                    <h3>Product 3</h3>
+                    <p class="price">₪199.99</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+                <div class="product-card">
+                    <img src="https://via.placeholder.com/300x300?text=Product+4" alt="Product 4">
+                    <img src="https://via.placeholder.com/300x300?text=Product+4+Alt" alt="Product 4 Alternative" class="hover-image">
+                    <h3>Product 4</h3>
+                    <p class="price">₪349.99</p>
+                    <button class="add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>About Us</h4>
+                <ul>
+                    <li><a href="#">Our Story</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Store Locator</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Follow Us</h4>
+                <div class="social-icons">
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i><img src="facebook-icon.png" alt="Facebook"></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i><img src="instagram-icon.png" alt="Instagram"></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i><img src="x-icon.png" alt="Twitter"></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2024 Mamokia. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
