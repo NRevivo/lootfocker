@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const port = 3000;
 
@@ -8,9 +9,12 @@ const { Product, User, Order } = require('./config/db'); // ייבוא כל המ
 // Middleware - להגדיר את השרת לעבודה עם JSON
 app.use(express.json());
 
-// דוגמה לנתיב פשוט
+// הגדרת תיקיית public כסטטית
+app.use(express.static(path.join(__dirname, 'public')));
+
+// דף ראשי
 app.get('/', (req, res) => {
-  res.send('ברוך הבא לאתר LootFocker!');
+  res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
 });
 
 // נתיב לקבלת רשימת כל המוצרים
@@ -74,31 +78,10 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// פונקציה ליצירת מוצר לדוגמה
-async function createTestProduct() {
-  const product = new Product({
-    name: 'נעל ספורט',
-    description: 'נעל קלה ונוחה לפעילות גופנית',
-    price: 120,
-    category: 'נעליים',
-    stock: 30,
-    images: ['https://example.com/image1.jpg', 'https://example.com/image2.jpg'],
-    sizes: ['38', '39', '40'],
-    colors: ['שחור', 'כחול']
-  });
-
-  try {
-    const result = await product.save();
-    console.log('Product created successfully:', result);
-  } catch (error) {
-    console.error('Error creating product:', error);
-  }
-}
-
 // נתיב ליצירת מוצר חדש
 app.post('/api/products', async (req, res) => {
   try {
-    const { name, description, price, category, stock, images, sizes, colors } = req.body;
+    const { name, description, price, category, stock, images, sizes, colors, discountPercentage } = req.body;
 
     // בדוק שכל השדות הנדרשים קיימים
     if (!name || !description || !price || !category || !stock) {
@@ -114,8 +97,9 @@ app.post('/api/products', async (req, res) => {
       stock,
       images,
       sizes,
-      colors
-    });
+      colors,
+      discountPercentage
+    }); 
 
     await product.save();
     res.status(201).send(product);
@@ -123,11 +107,17 @@ app.post('/api/products', async (req, res) => {
     console.error('Error while saving product:', err);
     res.status(500).send('Server Error');
   }
+}); 
+
+// נתיב לקבלת מוצרים במבצע
+app.get('/api/products/discounts', async (req, res) => {
+  try {
+    const discountedProducts = await Product.find({ discountPercentage: { $gt: 0 } });
+    res.json(discountedProducts);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
 });
-
-
-// יצירת מוצר לדוגמה - ניתן להפעיל את הפונקציה הזו לצורך בדיקה
-createTestProduct(); 
 
 // הפעלת השרת
 app.listen(port, () => {

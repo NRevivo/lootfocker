@@ -12,7 +12,7 @@
 <body>
     <header class="sticky-header">
         <nav>
-            <div class="logo">Loot Focker</div>
+            <a href="homepage.html" class="logo">Loot Focker</a>
             <ul class="nav-links">
                 <li><a href="#">Men</a></li>
                 <li><a href="#">Women</a></li>
@@ -20,11 +20,15 @@
                 <li><a href="#">New Arrivals</a></li>
                 <li><a href="#">Sale</a></li>
             </ul>
+            <div class="container">
+                <input type="text" placeholder="Search...">
+                <button type="submit" class="search"><i class="fas fa-search"></i></button>
+            </div>
             <div class="login-register">
                 <a href="#">Login/Register</a>
             </div>            
             <div class="shopping-cart">
-                <img src="cart-icon.png" alt="Shopping Cart">
+                <img src="/images/cart-icon.png" alt="Shopping Cart">
                 <span class="cart-count">0</span>
             </div>
             <div class="hamburger">
@@ -37,7 +41,7 @@
 
     <div id="loginModal" class="modal">
         <div class="modal-content">
-            <span class="close">&times;</span>
+            <span class="close" aria-label="Close">&times;</span>
             <h2>Login</h2>
             <form>
                 <div class="form-group">
@@ -55,12 +59,13 @@
         </div>
     </div>
     
+    
 
     <main>
         <section class="hero-carousel">
             <!-- Existing carousel slides -->
             <div class="carousel-slide active">
-                <img src="./banner1.jpg" alt="New Arrivals">
+                <img src="/images/banner1.jpg" alt="New Arrivals">
                 <div class="carousel-content">
                     <h1>New Arrivals</h1>
                     <p>Check out the latest styles</p>
@@ -68,20 +73,14 @@
                 </div>
             </div>
             <div class="carousel-slide">
-                <img src="/Users/noamrevivo/Desktop/lootfocker/images/banner_fall_web3.jpg.webp" alt="Summer Sale">
-                <div class="carousel-content">
-                    <h1>Summer Sale</h1>
-                    <p>Up to 50% off on selected items</p>
-                    <a href="#" class="cta-button">Shop Sale</a>
+                <img src="/images/banner2.jpg" alt="Summer Sale">
+                <div class="carousel-content"></div>  
                 </div>
             </div>
             <!-- New Sales Banner -->
             <div class="carousel-slide">
-                <img src="/Users/noamrevivo/Desktop/lootfocker/images/banner_fall_web3.jpg.webp" alt="Fall Collection Sale">
+                <img src="/images/banner3.webp" alt="Fall Collection Sale">
                 <div class="carousel-content">
-                    <h1>Fall Collection Sale</h1>
-                    <p>Don't miss out on the new fall styles</p>
-                    <a href="#" class="cta-button">Shop Fall Collection</a>
                 </div>
             </div>
         </section>
@@ -142,9 +141,9 @@
             <div class="footer-section">
                 <h4>Follow Us</h4>
                 <div class="social-icons">
-                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i><img src="facebook-icon.png" alt="Facebook"></a>
-                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i><img src="instagram-icon.png" alt="Instagram"></a>
-                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i><img src="x-icon.png" alt="Twitter"></a>
+                    <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i><img src="/images/facebook-icon.png" alt="Facebook"></a>
+                    <a href="#" class="social-icon"><i class="fab fa-instagram"></i><img src="/images/instagram-icon.png" alt="Instagram"></a>
+                    <a href="#" class="social-icon"><i class="fab fa-twitter"></i><img src="/images/x-icon.png" alt="Twitter"></a>
                 </div>
             </div>
         </div>

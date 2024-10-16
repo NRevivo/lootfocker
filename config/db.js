@@ -1,3 +1,5 @@
+// config/db.js
+
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
@@ -17,6 +19,7 @@ const productSchema = new mongoose.Schema({
   images: [String],
   sizes: [String],
   colors: [String],
+  discountPercentage: { type: Number, min: 0, max: 90, default: 0 }, // אחוזי הנחה
   dateAdded: { type: Date, default: Date.now }
 });
 
@@ -70,7 +73,7 @@ const userSchema = new mongoose.Schema({
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
       quantity: { type: Number, required: true },
-      dateAddedToCart: { type: Date, default: Date.now } // תאריך כניסה לעגלה
+      dateAddedToCart: { type: Date, default: Date.now }
     }
   ],
   dateJoined: { type: Date, default: Date.now }

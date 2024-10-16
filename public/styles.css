@@ -30,8 +30,14 @@ nav {
 }
 
 .logo {
-    font-size: 1.5rem;
+    color: #fff; /* White text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 1.5rem; /* Adjust size as needed */
     font-weight: bold;
+}
+.logo:hover {
+    color: #fff; /* Ensures color remains white on hover */
+    text-decoration: none; /* Ensures no underline on hover */
 }
 
 .nav-links {
@@ -234,34 +240,106 @@ nav {
     font-weight: bold;
 }
 
+/* Modal Overlay */
 .modal {
-    display: none;
+    /*display: none; /* Hidden by default */
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+
+
+/* Modal Content Centering */
 .modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 500px;
-    border-radius: 10px;
+    background-color: #ffffff;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
+    max-width: 400px;
+    width: 90%; /* Responsive width */
+    position: relative;
+    font-family: 'Roboto', sans-serif;
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
 }
 
 .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
     color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+    cursor: pointer;
 }
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.3s ease;
+}
+
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
+    border-color: #b20000; /* Highlight color on focus */
+}
+
+.button-group {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.cta-button {
+    background-color: #b20000; /* Red color */
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+}
+
+.cta-button:hover {
+    background-color: #ff0000; /* Brighter red on hover */
+    transform: translateY(-2px); /* Subtle lift effect */
+}
+
+.cta-button:active {
+    background-color: #cc0000; /* Darker red on click */
+    transform: translateY(0); /* Reset lift effect */
+}
+
 
 .close:hover,
 .close:focus {
@@ -357,4 +435,59 @@ footer {
     .product-grid {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     }
+}
+
+/*searchbox */
+.sticky-header .container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9; /* Light background */
+    padding: 0.3rem;
+    border-radius: 25px; /* Smooth pill shape */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    overflow: hidden;
+}
+
+.sticky-header .container input[type="text"] {
+    font-family: 'Roboto', sans-serif;
+    width: 180px;
+    height: 35px;
+    border: none;
+    outline: none;
+    padding-left: 15px;
+    background: #f9f9f9;
+    color: #333;
+    font-size: 14px;
+    border-radius: 0;
+}
+
+.sticky-header .container input[type="text"]:focus {
+    background: #ffffff;
+    box-shadow: none;
+}
+
+.sticky-header .container .search {
+    background: #000;
+    padding: 0;
+    width: 45px; /* Match button width with input field height for a round look */
+    height: 35px;
+    border: none;
+    border-radius: 0 25px 25px 0; /* Rounded right corners */
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+    font-size: 14px;
+}
+
+.sticky-header .container .search:hover {
+    background: #333; /* Slightly lighter on hover */
+}
+
+.sticky-header .container input[type="text"]::placeholder {
+    color: rgba(51, 51, 51, 0.5);
+    font-weight: normal;
 }

@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         showSlide(currentSlide + 1);
     }
 
-    setInterval(nextSlide, 5000); // Change slide every 5 seconds
+    setInterval(nextSlide, 7000); // Change slide every 7 seconds
 
     // Mobile menu toggle
     const hamburger = document.querySelector('.hamburger');
@@ -111,19 +111,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const loginLink = document.querySelector(".login-register a");
     const closeModal = document.querySelector(".close");
 
+    // Ensure the modal is hidden by default
+    modal.style.display = "none";
+
+    // Show the modal only when clicking the "Login/Register" link
     loginLink.addEventListener("click", function(event) {
         event.preventDefault();
-        modal.style.display = "block";
+        modal.style.display = "flex"; // Display modal as flex to center it
     });
 
-    closeModal.addEventListener("click", function() {
-        modal.style.display = "none";
-    });
+    // Hide the modal when clicking the "X" button
+    if (closeModal) {
+        closeModal.addEventListener("click", function() {
+            modal.style.display = "none";
+        });
+    }
 
+    // Hide the modal when clicking outside of it
     window.addEventListener("click", function(event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     });
-    
+
+    // ... (rest of the code remains the same)
+});
+
+// Add this outside of the DOMContentLoaded event listener
+window.addEventListener('load', function() {
+    const modal = document.getElementById("loginModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
 });
