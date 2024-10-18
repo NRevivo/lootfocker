@@ -137,10 +137,101 @@ document.addEventListener('DOMContentLoaded', function() {
     // ... (rest of the code remains the same)
 });
 
-// Add this outside of the DOMContentLoaded event listener
-window.addEventListener('load', function() {
-    const modal = document.getElementById("loginModal");
-    if (modal) {
-        modal.style.display = "none";
+document.addEventListener('DOMContentLoaded', function() {
+    const cartToggle = document.getElementById('cartToggle');
+    const cartDropdown = document.getElementById('cartDropdown');
+    const closeCart = document.getElementById('closeCart');
+    
+    // Toggle cart dropdown
+    cartToggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        cartDropdown.classList.toggle('active');
+    });
+    
+    // Close cart when clicking the close button
+    closeCart.addEventListener('click', function() {
+        cartDropdown.classList.remove('active');
+    });
+    
+    // Close cart when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!cartDropdown.contains(e.target) && !cartToggle.contains(e.target)) {
+            cartDropdown.classList.remove('active');
+        }
+    });
+
+    // Example function to add item to cart
+    function addToCart(item) {
+        const cartItems = document.querySelector('.cart-items');
+        const emptyCart = document.querySelector('.empty-cart');
+        
+        if (emptyCart) {
+            emptyCart.style.display = 'none';
+        }
+        
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+            <div class="cart-item-details">
+                <div class="cart-item-title">${item.name}</div>
+                <div class="cart-item-price">₪${item.price}</div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn">-</button>
+                    <span class="quantity-number">1</span>
+                    <button class="quantity-btn">+</button>
+                </div>
+            </div>
+            <button class="remove-item">×</button>
+        `;
+        
+        cartItems.appendChild(cartItem);
+        updateCartCount();
     }
+    
+    // Update cart count
+    function updateCartCount() {
+        const cartCount = document.querySelector('.cart-count');
+        const itemCount = document.querySelectorAll('.cart-item').length;
+        cartCount.textContent = itemCount;
+    }
+});
+
+//nav menu
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle mobile menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (hamburger) {
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+    }
+
+    // Handle mobile submenu toggles
+    const menuItems = document.querySelectorAll('.has-submenu');
+    
+    if (window.innerWidth <= 768) {
+        menuItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('.has-submenu')) {
+                    e.preventDefault();
+                    item.classList.toggle('active');
+                }
+            });
+        });
+    }
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.nav-links')) {
+            menuItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+            }
+        }
+    });
 });
