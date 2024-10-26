@@ -1,0 +1,6 @@
+@echo off
+echo Starting MongoDB service...
+net start MongoDB
+echo Starting Node.js server...
+npm start
+pause
