@@ -5,6 +5,7 @@ const port = 3000;
 
 // חיבור למסד הנתונים (יבוא קובץ החיבור שיצרת - db.js)
 const { Product, User, Order } = require('./config/db'); // ייבוא כל המודלים כולל Product, User, Order
+const { default: mongoose } = require('mongoose');
 
 // Middleware - להגדיר את השרת לעבודה עם JSON
 app.use(express.json());
@@ -123,3 +124,16 @@ app.get('/api/products/discounts', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+async function connectToDB() {
+  try {
+    await mongoose.connect(
+      process.env.DB_MONGODB
+    );
+    console.log('Connected to MongoDB');
+  }
+  catch(error){
+    console.error('Error connecting to MongoDB:', error);
+  }
+}
+connectToDB();
