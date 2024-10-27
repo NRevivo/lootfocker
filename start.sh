@@ -12,5 +12,5 @@ else
 fi
 
 # הפעלת השרת Node.js
-echo "Starting Node.js server..."
-node server.js
+echo "Starting Nodemon.js server..."
+Nodemon server.js
