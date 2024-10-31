@@ -11,6 +11,6 @@ else
   brew services start mongodb-community@6.0
 fi
 
-# הפעלת השרת Node.js
-echo "Starting Nodemon.js server..."
-Nodemon server.js
+# הפעלת השרת Node.js עם nodemon
+echo "Starting Nodemon server..."
+nodemon server.js

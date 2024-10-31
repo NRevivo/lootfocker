@@ -1,13 +1,16 @@
-// config/db.js
-
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const bcrypt = require('bcrypt');
 
-// התחברות ל-MongoDB
-mongoose.connect('mongodb://localhost:27017/lootfocker')
-  .then(() => console.log('Connected to MongoDB...'))
-  .catch(err => console.error('Could not connect to MongoDB...', err));
+// התחברות ל-MongoDB Atlas
+const connectionString = 'mongodb+srv://noamrevivo1:Noam1234@data.gcxe8.mongodb.net/';
+
+mongoose.connect(connectionString, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+  .then(() => console.log('Connected to MongoDB Atlas...'))
+  .catch(err => console.error('Could not connect to MongoDB Atlas...', err));
 
 // הגדרת סכמת מוצר (Product Schema)
 const productSchema = new mongoose.Schema({
