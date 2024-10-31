@@ -1360,3 +1360,143 @@ footer {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: left;
 }
+
+.admin-button.active-admin {
+    color: #ff0000;
+    font-weight: bold;
+    border-bottom: 2px solid #ff0000;
+}
+
+
+/* Reset & Basic Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    line-height: 1.6;
+    color: #333;
+}
+
+/* עיצוב ראשי ללוח הבקרה של Admin */
+.admin-panel {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* סגנון כותרת לוח הבקרה */
+.admin-panel h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+/* עיצוב כרטיסיות לוח הבקרה */
+.admin-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* כרטיס בודד */
+.admin-card {
+    background-color: #f9f9f9;
+    width: 250px;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 250px; /* גובה מינימלי אחיד */
+}
+
+/* אפקט ריחוף על כרטיס */
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* כותרת של כל כרטיס */
+.admin-card h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* תיאור הכרטיס */
+.admin-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+/* סגנון כפתורים */
+.btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #fff;
+    min-height: 50px; /* גובה מינימלי אחיד */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* סגנונות צבעים שונים לכפתורים */
+.btn.blue {
+    background-color: #007bff;
+}
+
+.btn.blue:hover {
+    background-color: #0056b3;
+}
+
+.btn.yellow {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn.yellow:hover {
+    background-color: #e0a800;
+}
+
+.btn.black {
+    background-color: #343a40;
+}
+
+.btn.black:hover {
+    background-color: #1d2124;
+}
+
+.btn.red {
+    background-color: #dc3545;
+}
+
+.btn.red:hover {
+    background-color: #c82333;
+}
+
+/* אזור תצוגת נתונים נוספים */
+.data-display {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}

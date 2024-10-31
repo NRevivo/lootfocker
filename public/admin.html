@@ -30,22 +30,38 @@
             <div class="admin-card">
                 <h2>Past Orders Section</h2>
                 <p>View all past orders here.</p>
-                <button class="btn black">Show orders</button>
+                <button class="btn black">Show Orders</button>
             </div>
             <div class="admin-card">
-                <h2>Past Orders Section</h2>
+                <h2>Grouped Orders Section</h2>
                 <p>View orders grouped by users here.</p>
-                <button class="btn red">Show grouped orders</button>
+                <button class="btn red">Show Grouped Orders</button>
             </div>
         </div>
 
-        <!-- אזור תצוגת נתונים נוספים -->
+        <!-- Data display section -->
         <div class="data-display" id="data-display">
-            <!-- נתונים יופיעו כאן -->
+            <!-- Data will be displayed here dynamically -->
         </div>
     </main>
 
-    <!-- לשונית תחתונה -->
-        <div id="footer-container"></div>
+    <!-- Placeholder for footer -->
+    <div id="footer-container"></div>
+
+    <script>
+        // Load header and footer dynamically
+        function loadContent(url, containerId) {
+            fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById(containerId).innerHTML = data;
+                })
+                .catch(error => console.error(`Error loading ${url}:`, error));
+        }
+
+        // Load header and footer
+        loadContent('header.html', 'header-container');
+        loadContent('footer.html', 'footer-container');
+    </script>
 </body>
 </html>
