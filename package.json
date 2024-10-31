@@ -1,0 +1,22 @@
+{
+  "name": "lootfocker",
+  "version": "1.0.0",
+  "description": "run ./start.sh in the terminal to start the project, then go to http://localhost:3000/# to browse the website",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "express": "^4.21.1",
+    "joi": "^17.13.3",
+    "mongoose": "^8.7.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

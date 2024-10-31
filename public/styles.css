@@ -650,7 +650,7 @@ nav {
 
 /* Modal Overlay */
 .modal {
-    /*display: none; /* Hidden by default */
+    display: none; /* Hidden by default */
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -658,12 +658,9 @@ nav {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-    display: flex;
     align-items: center;
     justify-content: center;
 }
-
-
 
 /* Modal Content Centering */
 .modal-content {
@@ -881,12 +878,12 @@ footer {
 }
 
 .sticky-header .container .search {
-    background: #000;
+    background: #000 url("/images/search.png") no-repeat center; /* מיקום התמונה */
     padding: 0;
-    width: 45px; /* Match button width with input field height for a round look */
+    width: 45px;
     height: 35px;
     border: none;
-    border-radius: 0 25px 25px 0; /* Rounded right corners */
+    border-radius: 0 25px 25px 0;
     cursor: pointer;
     color: #fff;
     display: flex;
@@ -894,6 +891,8 @@ footer {
     justify-content: center;
     transition: background 0.3s ease;
     font-size: 14px;
+    background-size: 16px; /* גודל האייקון */
+
 }
 
 .sticky-header .container .search:hover {
@@ -903,4 +902,461 @@ footer {
 .sticky-header .container input[type="text"]::placeholder {
     color: rgba(51, 51, 51, 0.5);
     font-weight: normal;
+}
+
+/* עיצוב טופס צור קשר */
+.contact-us {
+    font-family: 'Roboto', sans-serif;
+    text-align: center;
+    direction: rtl; /* כיוון ימין לשמאל */
+    margin: 50px auto;
+    max-width: 400px;
+}
+
+.contact-us h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.contact-us p {
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.contact-us .form-group {
+    margin-bottom: 15px;
+}
+
+.contact-us input,
+.contact-us textarea {
+    width: 100%;
+    font-family: 'Roboto', sans-serif;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box;
+}
+
+.contact-us textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.contact-us button {
+    width: 100%;
+    padding: 12px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.contact-us button:hover {
+    background-color: #555;
+}
+
+/* עיצוב עמוד מידע למשלוחים */
+.shipping-header {
+    text-align: center;
+    padding: 20px;
+}
+
+.shipping-header .cart-icon {
+    width: 40px;
+    height: auto;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.shipping-header h1 {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.shipping-info {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.shipping-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.shipping-table thead th {
+    background-color: #f4f4f4;
+    padding: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1em;
+    border: 1px solid #ddd;
+}
+
+.shipping-table tbody td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 1em;
+}
+
+.shipping-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.note {
+    font-size: 0.9em;
+    color: #555;
+    text-align: center;
+    margin: 5px 0;
+}
+
+/* סגנון כותרת ודף בית */
+.shipping-header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.shipping-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.breadcrumb {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #000;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* סגנון עמוד החזרות */
+.shipping-header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.shipping-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.breadcrumb {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #000;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* עיצוב לחלק הראשי של הדף */
+.shipping-header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.shipping-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.breadcrumb {
+    text-align: center;
+    margin: 10px 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.breadcrumb a {
+    color: #000;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+/* עיצוב לחלק ההחזרות */
+.shipping-info {
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 0 20px;
+    text-align: center;
+    direction: rtl; /* כיוון מימין לשמאל */
+}
+
+.shipping-info h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.shipping-steps {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end; /* הצבת השלבים מימין לשמאל */
+    gap: 20px;
+    text-align: center;
+}
+
+.step {
+    width: 30%;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.step h4 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.step p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.step img {
+    margin-top: 10px;
+    width: 50px;
+    height: auto;
+}
+
+/* עיצוב הקישור להדפסת מדבקה */
+.step a {
+    color: #ff0000;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.step a:hover {
+    text-decoration: underline;
+}
+
+/* עיצוב הודעת ההערה */
+.note {
+    font-size: 0.9rem;
+    color: #555;
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* התאמה לרספונסיביות */
+@media screen and (max-width: 768px) {
+    .shipping-steps {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .step {
+        width: 100%;
+    }
+}
+
+/* עיצוב החלק של אודות */
+.about-section {
+    text-align: center;
+    direction: rtl; /* כיוון ימין לשמאל */
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.about-logo {
+    width: 150px;
+    margin: 20px 0;
+}
+
+.about-section h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.about-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.about-note {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+/* עיצוב קטע המפה */
+.map-section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.map-section h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+    text-align: center;
+}
+
+.map-section iframe {
+    width: 100%;
+    height: 480px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* סגנון כפתור Admin בצבע אדום קבוע */
+.admin-button {
+    color: #ff0000 !important; /* צבע אדום קבוע */
+    font-weight: bold;
+}
+
+/* עיצוב ראשי ללוח הבקרה של Admin */
+.admin-panel {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* סגנון כותרת לוח הבקרה */
+.admin-panel h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    color: #333;
+}
+
+/* עיצוב כרטיסיות לוח הבקרה */
+.admin-sections {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* כרטיס בודד */
+.admin-card {
+    background-color: #f9f9f9;
+    width: 250px;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+/* אפקט ריחוף על כרטיס */
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* כותרת של כל כרטיס */
+.admin-card h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+/* תיאור הכרטיס */
+.admin-card p {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 1.5rem;
+}
+
+/* סגנונות כפתורים */
+.btn {
+    padding: 0.6rem 1.2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    color: #fff;
+}
+
+.btn.blue {
+    background-color: #007bff;
+}
+
+.btn.blue:hover {
+    background-color: #0056b3;
+}
+
+.btn.yellow {
+    background-color: #ffc107;
+    color: #333;
+}
+
+.btn.yellow:hover {
+    background-color: #e0a800;
+}
+
+.btn.black {
+    background-color: #343a40;
+}
+
+.btn.black:hover {
+    background-color: #1d2124;
+}
+
+.btn.red {
+    background-color: #dc3545;
+}
+
+.btn.red:hover {
+    background-color: #c82333;
+}
+
+/* אזור תצוגת נתונים נוספים */
+.data-display {
+    margin-top: 3rem;
+    padding: 1.5rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: left;
 }
