@@ -1,139 +1,261 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const { connectToDB, Shoe, User, Order } = require('./config/db');
+const http = require('http');
+const socketIo = require('socket.io');
 const app = express();
 const port = 3000;
 
-// חיבור למסד הנתונים (יבוא קובץ החיבור שיצרת - db.js)
-const { Product, User, Order } = require('./config/db'); // ייבוא כל המודלים כולל Product, User, Order
-const { default: mongoose } = require('mongoose');
+// Create HTTP server
+const server = http.createServer(app);
 
-// Middleware - להגדיר את השרת לעבודה עם JSON
-app.use(express.json());
+// Initialize Socket.IO
+const io = socketIo(server);
 
-// הגדרת תיקיית public כסטטית
-app.use(express.static(path.join(__dirname, 'public')));
+// Connect to the database
+connectToDB().then(() => {
+  // Middleware - Set server to work with JSON
+  app.use(express.json());
 
-// דף ראשי
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
-});
+  // Set public directory as static
+  app.use(express.static(path.join(__dirname, 'public')));
 
-// נתיב לקבלת רשימת כל המוצרים
-app.get('/api/products', async (req, res) => {
-  try {
-    const products = await Product.find(); // שליפת כל המוצרים ממסד הנתונים
-    res.json(products); // שליחה של המוצרים כ-JSON
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
+  // Handle Socket.IO connections
+  io.on('connection', (socket) => {
+    console.log('New client connected');
 
-// נתיב ליצירת הזמנה חדשה
-app.post('/api/orders', async (req, res) => {
-  try {
-    const { userId, products, totalAmount, shippingAddress } = req.body;
-
-    // בדוק שכל השדות קיימים ובתקינות
-    if (!userId || !products || !totalAmount || !shippingAddress) {
-      return res.status(400).send('All fields are required.');
-    }
-
-    // צור אובייקט הזמנה חדש ושמור אותו
-    const order = new Order({
-      userId,
-      products,
-      totalAmount,
-      shippingAddress
+    socket.on('disconnect', () => {
+      console.log('Client disconnected');
     });
+  });
 
-    await order.save();
-    res.status(201).send(order);
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
+  // Home page
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'homepage.html'));
+  });
 
-// נתיב ליצירת משתמש חדש
-app.post('/api/users', async (req, res) => {
+  // Route to get all shoes
+  app.get('/api/shoes', async (req, res) => {
+    try {
+      const shoes = await Shoe.find();
+      res.json(shoes);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to create a new shoe
+app.post('/api/shoes', async (req, res) => {
   try {
-    const { email, password, address, paymentMethod, role } = req.body;
+    const { name, description, price, category, brand, sizes, colors, stock, images } = req.body;
 
-    // בדוק שכל השדות קיימים ובתקינות
-    if (!email || !password) {
-      return res.status(400).send('Email and password are required.');
+    if (!name || !price || !stock) {
+      return res.status(400).send('Name, price and stock are required.');
     }
 
-    // צור משתמש חדש ושמור אותו
-    const user = new User({
-      email,
-      password,
-      address,
-      paymentMethod,
-      role
-    });
-
-    await user.save();
-    res.status(201).send(user);
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
-
-// נתיב ליצירת מוצר חדש
-app.post('/api/products', async (req, res) => {
-  try {
-    const { name, description, price, category, stock, images, sizes, colors, discountPercentage } = req.body;
-
-    // בדוק שכל השדות הנדרשים קיימים
-    if (!name || !description || !price || !category || !stock) {
-      return res.status(400).send('All required fields must be provided.');
-    }
-
-    // צור מוצר חדש ושמור אותו במסד הנתונים
-    const product = new Product({
+    const shoe = new Shoe({
       name,
       description,
       price,
       category,
-      stock,
-      images,
+      brand,
       sizes,
       colors,
-      discountPercentage
-    }); 
+      stock,
+      images
+    });
 
-    await product.save();
-    res.status(201).send(product);
-  } catch (err) {
-    console.error('Error while saving product:', err);
-    res.status(500).send('Server Error');
-  }
-}); 
-
-// נתיב לקבלת מוצרים במבצע
-app.get('/api/products/discounts', async (req, res) => {
-  try {
-    const discountedProducts = await Product.find({ discountPercentage: { $gt: 0 } });
-    res.json(discountedProducts);
+    await shoe.save();
+    res.status(201).send(shoe);
   } catch (err) {
     res.status(500).send('Server Error');
   }
 });
 
-// הפעלת השרת
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+  // Route to update an existing shoe
+  app.put('/api/shoes/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
 
-async function connectToDB() {
-  try {
-    await mongoose.connect(
-      process.env.DB_MONGODB
-    );
-    console.log('Connected to MongoDB');
-  }
-  catch(error){
-    console.error('Error connecting to MongoDB:', error);
-  }
-}
-connectToDB();
+      const shoe = await Shoe.findByIdAndUpdate(id, updates, { new: true });
+
+      if (!shoe) {
+        return res.status(404).send('Shoe not found');
+      }
+
+      res.status(200).send(shoe);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to delete a shoe
+  app.delete('/api/shoes/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const shoe = await Shoe.findByIdAndDelete(id);
+
+      if (!shoe) {
+        return res.status(404).send('Shoe not found');
+      }
+
+      res.status(200).send('Shoe deleted successfully');
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to create a new order
+  app.post('/api/orders', async (req, res) => {
+    try {
+      const { userId, shoes, totalAmount, shippingAddress } = req.body;
+
+      if (!userId || !shoes || !totalAmount || !shippingAddress) {
+        return res.status(400).send('All fields are required.');
+      }
+
+      const order = new Order({
+        userId,
+        shoes,
+        totalAmount,
+        shippingAddress,
+      });
+
+      await order.save();
+      res.status(201).send(order);
+
+      // Emit event to clients that a new order has been created
+      io.emit('orderCreated', order);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to get all orders
+  app.get('/api/orders', async (req, res) => {
+    try {
+      const orders = await Order.find();
+      res.json(orders);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to update an existing order
+  app.put('/api/orders/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+
+      const order = await Order.findByIdAndUpdate(id, updates, { new: true });
+
+      if (!order) {
+        return res.status(404).send('Order not found');
+      }
+
+      res.status(200).send(order);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to delete an order
+  app.delete('/api/orders/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const order = await Order.findByIdAndDelete(id);
+
+      if (!order) {
+        return res.status(404).send('Order not found');
+      }
+
+      res.status(200).send('Order deleted successfully');
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to create a new user
+  app.post('/api/users', async (req, res) => {
+    try {
+      const { email, password, address, paymentMethod, role } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).send('Email and password are required.');
+      }
+
+      const user = new User({
+        email,
+        password,
+        address,
+        paymentMethod,
+        role,
+      });
+
+      await user.save();
+      res.status(201).send(user);
+
+      // Emit event to clients that a new user has been created
+      io.emit('userCreated', user);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to get all users
+  app.get('/api/users', async (req, res) => {
+    try {
+      const users = await User.find();
+      res.json(users);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to update an existing user
+  app.put('/api/users/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body;
+
+      const user = await User.findByIdAndUpdate(id, updates, { new: true });
+
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+      res.status(200).send(user);
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to delete a user
+  app.delete('/api/users/:id', async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const user = await User.findByIdAndDelete(id);
+
+      if (!user) {
+        return res.status(404).send('User not found');
+      }
+
+      res.status(200).send('User deleted successfully');
+    } catch (err) {
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Start the server
+  server.listen(port, () => {
+    console.log(`Server is running on http://localhost:${port}`);
+  });
+}).catch((err) => {
+  console.error('Failed to connect to the database:', err);
+  process.exit(1);
+});

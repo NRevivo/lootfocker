@@ -1,16 +1,19 @@
 #!/bin/bash
 
-# בדיקת אם השירות כבר פועל והפעלתו או אתחולו בהתאם
-echo "Starting MongoDB service..."
-brew services list | grep 'mongodb-community@6.0.*started' &> /dev/null
-
-if [ $? -eq 0 ]; then
-  echo "MongoDB service is already running. Restarting..."
-  brew services restart mongodb-community@6.0
+# לטעון את משתני הסביבה
+if [ -f .env ]; then
+    echo "Loading environment variables..."
+    export $(cat .env | sed 's/#.*//g' | xargs)
 else
-  brew services start mongodb-community@6.0
+    echo "Warning: .env file not found"
 fi
 
-# הפעלת השרת Node.js עם nodemon
+# בדיקה אם nodemon מותקן
+if ! command -v nodemon &> /dev/null; then
+    echo "Nodemon not found. Installing..."
+    npm install -g nodemon
+fi
+
+# הפעלת השרת Node.js באמצעות Nodemon
 echo "Starting Nodemon server..."
 nodemon server.js
