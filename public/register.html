@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loot Focker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="homepage.js"></script>
+</head>
+<body>
+    <!-- Placeholder for header -->
+    <div id="header-container"></div>
+    <div role="main">
+        <main class="registration-page">
+            <div class="registration-container">
+                <h1>Create Account</h1>
+                <form id="registrationForm" class="registration-form">
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h2>Personal Information</h2>
+                        <div class="form-group">
+                            <label for="firstName">First Name *</label>
+                            <input type="text" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name *</label>
+                            <input type="text" id="lastName" name="lastName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password *</label>
+                            <input type="password" id="password" name="password" required>
+                            <small class="password-requirements">
+                            </small>
+                        </div>
+                        
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-section">
+                        <h2>Address</h2>
+                        <div class="form-group">
+                            <label for="street">Street Address *</label>
+                            <input type="text" id="street" name="street" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="city">City *</label>
+                            <input type="text" id="city" name="city" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="postalCode">Postal Code</label>
+                            <input type="text" id="postalCode" name="postalCode">
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div class="form-section">
+                        <h2>Payment Method</h2>
+                        <div class="form-group">
+                            <label for="cardNumber">Card Number *</label>
+                            <input type="text" id="cardNumber" name="cardNumber" maxlength="16" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="expirationDate">Expiration Date *</label>
+                                <input type="text" id="expirationDate" name="expirationDate" placeholder="MM/YY" required>
+                            </div>
+                            <div class="form-group half">
+                                <label for="cvv">CVV *</label>
+                                <input type="text" id="cvv" name="cvv" maxlength="4" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cardHolderName">Cardholder Name *</label>
+                            <input type="text" id="cardHolderName" name="cardHolderName" required>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-section">
+                        <div class="form-group checkbox">
+                            <input type="checkbox" id="terms" name="terms" required>
+                            <label for="terms">I agree to the Terms of Service and Privacy Policy *</label>
+                        </div>
+                        
+                    </div>
+
+                    <div class="form-note">
+                        * Required fields
+                    </div>
+
+                    <button type="submit" class="submit-button">Create Account</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer Container -->
+    <div id="footer-container"></div>
+
+    <!-- Scripts -->
+    <script src="js/register.js"></script>
+</body>
+</html>

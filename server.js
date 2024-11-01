@@ -179,32 +179,49 @@ app.post('/api/shoes', async (req, res) => {
     }
   });
 
-  // Route to create a new user
-  app.post('/api/users', async (req, res) => {
-    try {
-      const { email, password, address, paymentMethod, role } = req.body;
+// מסלול להרשמת משתמש חדש
+app.post('/register', async (req, res) => {
+  try {
+      const {
+          firstName,
+          lastName,
+          email,
+          password,
+          address,
+          paymentMethod
+      } = req.body;
 
-      if (!email || !password) {
-        return res.status(400).send('Email and password are required.');
+      // שילוב השם הפרטי ושם המשפחה לשם מלא
+      const fullName = `${firstName} ${lastName}`;
+
+      // בדיקה אם המשתמש כבר קיים במסד הנתונים
+      const existingUser = await User.findOne({ email: email });
+      if (existingUser) {
+          return res.status(400).json({ message: 'User already exists' });
       }
 
-      const user = new User({
-        email,
-        password,
-        address,
-        paymentMethod,
-        role,
+      // יצירת אובייקט משתמש חדש
+      const newUser = new User({
+          fullName,
+          email,
+          password,
+          address,
+          paymentMethod,
+          role: 'user' // הגדרת תפקיד משתמש כברירת מחדל
       });
 
-      await user.save();
-      res.status(201).send(user);
+      // שמירת המשתמש החדש במסד הנתונים
+      await newUser.save();
+      res.status(201).json({ message: 'User registered successfully' });
+  } catch (err) {
+      console.error('Registration error:', err);
+      res.status(500).json({ message: 'Server error occurred during registration' });
+  }
+});
 
-      // Emit event to clients that a new user has been created
-      io.emit('userCreated', user);
-    } catch (err) {
-      res.status(500).send('Server Error');
-    }
-  });
+
+
+
 
   // Route to get all users
   app.get('/api/users', async (req, res) => {
@@ -250,6 +267,49 @@ app.post('/api/shoes', async (req, res) => {
       res.status(500).send('Server Error');
     }
   });
+
+  
+
+
+// מסלול התחברות
+app.post('/login', async (req, res) => {
+  try {
+      console.log('Login request received:', req.body); // הדפסת הבקשה שהתקבלה
+
+      // בדוק שהשדות email ו-password קיימים
+      if (!req.body.email || !req.body.password) {
+          console.log('Missing email or password');
+          return res.status(400).send({ message: "Email and password are required" });
+      }
+
+      // חיפוש משתמש במסד הנתונים לפי האימייל
+      const check = await User.findOne({ email: req.body.email });
+      console.log('User found:', check);
+
+      if (!check) {
+          console.log("User not found with email:", req.body.email);
+          return res.status(404).send({ message: "User not found" });
+      }
+
+      // השוואת הסיסמה
+      if (req.body.password === check.password) {
+          console.log('Password match for user:', req.body.email);
+          const role = check.role === 'admin' ? 'admin' : 'user';
+          const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
+          res.status(200).json({ message: 'Login successful', role, redirectUrl });
+      } else {
+          console.log('Password mismatch for user:', req.body.email);
+          res.status(401).send({ message: "Incorrect password" });
+      }
+  } catch (e) {
+      console.error("Login error:", e);
+      res.status(500).send({ message: "Server error occurred" });
+  }
+});
+
+
+
+
 
   // Start the server
   server.listen(port, () => {

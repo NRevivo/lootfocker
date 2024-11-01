@@ -1,5 +1,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Load header and footer dynamically with callback for event listeners
+    
+    
+    
     function loadContent(url, containerId, callback) {
         fetch(url)
             .then(response => response.text())

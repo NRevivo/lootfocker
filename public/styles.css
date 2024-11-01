@@ -650,81 +650,260 @@ nav {
 
 /* Modal Overlay */
 .modal {
-    display: none; /* Hidden by default */
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+    background-color: rgba(0, 0, 0, 0.5);
     align-items: center;
     justify-content: center;
 }
 
-/* Modal Content Centering */
 .modal-content {
     background-color: #ffffff;
-    padding: 20px 30px;
+    padding: 30px;
     border-radius: 8px;
-    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow */
-    max-width: 400px;
-    width: 90%; /* Responsive width */
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
     position: relative;
-    font-family: 'Roboto', sans-serif;
 }
 
-.modal-content h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 20px;
+/* Form Sections */
+.form-section {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+
+.form-section h3 {
+    margin-bottom: 15px;
     color: #333;
+    font-size: 1.1rem;
 }
 
-.close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 24px;
-    color: #aaa;
-    cursor: pointer;
-}
+/* Form Groups */
 .form-group {
     margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 0.9rem;
+    font-weight: 600;
     color: #333;
     margin-bottom: 5px;
 }
 
-.form-group input[type="email"],
-.form-group input[type="password"] {
+.form-group input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.9rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #b20000;
     outline: none;
-    transition: border 0.3s ease;
 }
 
-.form-group input[type="email"]:focus,
-.form-group input[type="password"]:focus {
-    border-color: #b20000; /* Highlight color on focus */
-}
-
+/* Buttons */
 .button-group {
-    text-align: center;
     margin-top: 20px;
-    gap: 10px;
-    margin-top: 15px;
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
+
+.cta-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #b20000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: #cc0000;
+}
+
+.switch-form-btn {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 5px;
+    text-decoration: underline;
+}
+
+.switch-form-btn:hover {
+    color: #b20000;
+}
+
+/* Close Button */
+.close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.close:hover {
+    color: #b20000;
+}
+
+/* Form Switching */
+.auth-form {
+    transition: opacity 0.3s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+    }
+
+    .form-section {
+        padding: 10px;
+    }
+}
+ .hidden {
+    display: none !important;
+}
+
+/* Registration Page Styles */
+.registration-page {
+    padding: 40px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.registration-container {
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.registration-page h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.form-section h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #b20000;
+    box-shadow: 0 0 0 2px rgba(178, 0, 0, 0.1);
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.password-requirements {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.form-group.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-group.checkbox input {
+    width: auto;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 15px;
+    background-color: #b20000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #cc0000;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .registration-container {
+        padding: 20px;
+    }
+}
+
 
 .cta-button {
     width: 100%;
@@ -1248,7 +1427,9 @@ footer {
 .admin-button {
     color: #ff0000 !important; /* צבע אדום קבוע */
     font-weight: bold;
+    display: block !important; /* לוודא שהכפתור מוצג */
 }
+
 
 /* עיצוב ראשי ללוח הבקרה של Admin */
 .admin-panel {
