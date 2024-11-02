@@ -46,32 +46,32 @@ connectToDB().then(() => {
   });
 
   // Route to create a new shoe
-app.post('/api/shoes', async (req, res) => {
-  try {
-    const { name, description, price, category, brand, sizes, colors, stock, images } = req.body;
+  app.post('/api/shoes', async (req, res) => {
+    try {
+      const { name, description, price, category, brand, sizes, colors, stock, images } = req.body;
 
-    if (!name || !price || !stock) {
-      return res.status(400).send('Name, price and stock are required.');
+      if (!name || !price || !stock) {
+        return res.status(400).send('Name, price and stock are required.');
+      }
+
+      const shoe = new Shoe({
+        name,
+        description,
+        price,
+        category,
+        brand,
+        sizes,
+        colors,
+        stock,
+        images
+      });
+
+      await shoe.save();
+      res.status(201).send(shoe);
+    } catch (err) {
+      res.status(500).send('Server Error');
     }
-
-    const shoe = new Shoe({
-      name,
-      description,
-      price,
-      category,
-      brand,
-      sizes,
-      colors,
-      stock,
-      images
-    });
-
-    await shoe.save();
-    res.status(201).send(shoe);
-  } catch (err) {
-    res.status(500).send('Server Error');
-  }
-});
+  });
 
   // Route to update an existing shoe
   app.put('/api/shoes/:id', async (req, res) => {
@@ -179,49 +179,44 @@ app.post('/api/shoes', async (req, res) => {
     }
   });
 
-// מסלול להרשמת משתמש חדש
-app.post('/register', async (req, res) => {
-  try {
+  // Route to register a new user
+  app.post('/register', async (req, res) => {
+    try {
       const {
-          firstName,
-          lastName,
-          email,
-          password,
-          address,
-          paymentMethod
+        firstName,
+        lastName,
+        email,
+        password,
+        address,
+        paymentMethod
       } = req.body;
 
-      // שילוב השם הפרטי ושם המשפחה לשם מלא
+      // Combine first and last name into full name
       const fullName = `${firstName} ${lastName}`;
 
-      // בדיקה אם המשתמש כבר קיים במסד הנתונים
+      // Check if user already exists
       const existingUser = await User.findOne({ email: email });
       if (existingUser) {
-          return res.status(400).json({ message: 'User already exists' });
+        return res.status(400).json({ message: 'User already exists' });
       }
 
-      // יצירת אובייקט משתמש חדש
+      // Create new user object
       const newUser = new User({
-          fullName,
-          email,
-          password,
-          address,
-          paymentMethod,
-          role: 'user' // הגדרת תפקיד משתמש כברירת מחדל
+        fullName,
+        email,
+        password,
+        address,
+        paymentMethod,
+        role: 'user'
       });
 
-      // שמירת המשתמש החדש במסד הנתונים
       await newUser.save();
       res.status(201).json({ message: 'User registered successfully' });
-  } catch (err) {
+    } catch (err) {
       console.error('Registration error:', err);
       res.status(500).json({ message: 'Server error occurred during registration' });
-  }
-});
-
-
-
-
+    }
+  });
 
   // Route to get all users
   app.get('/api/users', async (req, res) => {
@@ -268,48 +263,100 @@ app.post('/register', async (req, res) => {
     }
   });
 
-  
-
-
-// מסלול התחברות
-app.post('/login', async (req, res) => {
-  try {
-      console.log('Login request received:', req.body); // הדפסת הבקשה שהתקבלה
-
-      // בדוק שהשדות email ו-password קיימים
+  // Route to login
+  app.post('/login', async (req, res) => {
+    try {
       if (!req.body.email || !req.body.password) {
-          console.log('Missing email or password');
-          return res.status(400).send({ message: "Email and password are required" });
+        return res.status(400).send({ message: "Email and password are required" });
       }
 
-      // חיפוש משתמש במסד הנתונים לפי האימייל
       const check = await User.findOne({ email: req.body.email });
-      console.log('User found:', check);
 
       if (!check) {
-          console.log("User not found with email:", req.body.email);
-          return res.status(404).send({ message: "User not found" });
+        return res.status(404).send({ message: "User not found" });
       }
 
-      // השוואת הסיסמה
       if (req.body.password === check.password) {
-          console.log('Password match for user:', req.body.email);
-          const role = check.role === 'admin' ? 'admin' : 'user';
-          const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
-          res.status(200).json({ message: 'Login successful', role, redirectUrl });
+        const role = check.role === 'admin' ? 'admin' : 'user';
+        const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
+        res.status(200).json({ message: 'Login successful', role, redirectUrl });
       } else {
-          console.log('Password mismatch for user:', req.body.email);
-          res.status(401).send({ message: "Incorrect password" });
+        res.status(401).send({ message: "Incorrect password" });
       }
-  } catch (e) {
+    } catch (e) {
       console.error("Login error:", e);
       res.status(500).send({ message: "Server error occurred" });
-  }
+    }
+  });
+
+  // Route to filter shoes
+  app.get('/api/shoes/filter', async (req, res) => {
+    try {
+      const { category, brand, sizes, minPrice, maxPrice } = req.query;
+      let filter = {};
+
+      if (category) {
+        filter.category = category;
+      }
+      if (brand) {
+        filter.brand = { $in: brand.split(',') };
+      }
+      if (sizes) {
+        filter.sizes = { $in: sizes.split(',').map(Number) };
+      }
+      if (minPrice || maxPrice) {
+        filter.price = {};
+        if (minPrice) filter.price.$gte = Number(minPrice);
+        if (maxPrice) filter.price.$lte = Number(maxPrice);
+      }
+
+      const shoes = await Shoe.find(filter);
+      res.json(shoes);
+    } catch (err) {
+      console.error('Filter error:', err);
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to get distinct brands
+  app.get('/api/shoes/brands', async (req, res) => {
+    try {
+      const { category } = req.query;
+      const filter = category ? { category } : {};
+      const brands = await Shoe.distinct('brand', filter);
+      res.json(brands);
+    } catch (err) {
+      console.error('Brands error:', err);
+      res.status(500).send('Server Error');
+    }
+  });
+
+  // Route to get distinct categories
+  app.get('/api/shoes/categories', async (req, res) => {
+    try {
+      const categories = await Shoe.distinct('category');
+      res.json(categories);
+    } catch (err) {
+      console.error('Categories error:', err);
+      res.status(500).send('Server Error');
+    }
+  });
+
+  app.get('/api/shoes', (req, res) => {
+    const { category, brand } = req.query;
+
+    // סינון מוצרים ממסד הנתונים לפי הקטגוריה והמותג
+    let filteredShoes = shoes; // מתוך db.js
+
+    if (category) {
+        filteredShoes = filteredShoes.filter(shoe => shoe.category === category);
+    }
+    if (brand) {
+        filteredShoes = filteredShoes.filter(shoe => shoe.brand === brand);
+    }
+
+    res.json(filteredShoes);
 });
-
-
-
-
 
   // Start the server
   server.listen(port, () => {

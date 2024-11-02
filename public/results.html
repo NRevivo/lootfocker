@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loot Focker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        .results-container {
+            display: flex;
+            padding: 40px 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            gap: 40px;
+        }
+
+        /* Filters Section Styling */
+        .filters-section {
+            width: 280px;
+            position: sticky;
+            top: 20px;
+            align-self: flex-start;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-left: 0;
+        }
+
+        .filter-group {
+            margin-bottom: 35px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 25px;
+        }
+
+        .filter-group:last-child {
+            border-bottom: none;
+        }
+
+        .filter-group h3 {
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Checkboxes Styling */
+        .filter-options label {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            cursor: pointer;
+            font-size: 15px;
+            color: #444;
+            transition: color 0.2s;
+        }
+
+        .filter-options label:hover {
+            color: #000;
+        }
+
+        .filter-options input[type="checkbox"] {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 3px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .filter-options input[type="checkbox"]:checked {
+            background-color: #000;
+            border-color: #000;
+        }
+
+        .filter-options input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 12px;
+            left: 3px;
+            top: 0px;
+        }
+
+        /* Price Range Styling */
+        .price-filter {
+            padding: 10px 0;
+        }
+
+        .price-slider {
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #000;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        }
+
+        .price-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        /* Results Section Styling */
+        .products-section {
+            flex: 1;
+        }
+
+        .results-info {
+            margin-bottom: 30px;
+            font-size: 15px;
+            color: #666;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        /* Product Card Styling */
+        .product-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            z-index: 10;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+            z-index: 1;
+            position: relative;
+        }
+
+        .product-card:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product-details {
+            padding: 20px;
+            text-align: center;
+            background: #fff;
+            position: relative;
+            z-index: 2;
+        }
+
+        .product-details h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-details p {
+            font-size: 14px;
+            color: #777;
+        }
+
+        .product-card:hover .product-details {
+            transform: translateY(0);
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <div class="results-container">
+        <aside class="filters-section">
+            <div class="filter-group">
+                <h3>Brand</h3>
+                <div class="filter-options brands-list">
+                    <label><input type="checkbox" value="Nike"><span>Nike</span></label>
+                    <label><input type="checkbox" value="Adidas"><span>Adidas</span></label>
+                    <label><input type="checkbox" value="New Balance"><span>New Balance</span></label>
+                    <label><input type="checkbox" value="Converse"><span>Converse</span></label>
+                    <label><input type="checkbox" value="Puma"><span>Puma</span></label>
+                    <label><input type="checkbox" value="Vans"><span>Vans</span></label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Size</h3>
+                <div class="filter-options size-options">
+                    <label><input type="checkbox" value="38"><span>38</span></label>
+                    <label><input type="checkbox" value="39"><span>39</span></label>
+                    <label><input type="checkbox" value="40"><span>40</span></label>
+                    <label><input type="checkbox" value="41"><span>41</span></label>
+                    <label><input type="checkbox" value="42"><span>42</span></label>
+                    <label><input type="checkbox" value="43"><span>43</span></label>
+                    <label><input type="checkbox" value="44"><span>44</span></label>
+                    <label><input type="checkbox" value="45"><span>45</span></label>
+                    <label><input type="checkbox" value="46"><span>46</span></label>
+                    <label><input type="checkbox" value="47"><span>47</span></label>
+                    <label><input type="checkbox" value="48"><span>48</span></label>
+                    <label><input type="checkbox" value="49"><span>49</span></label>
+                    <label><input type="checkbox" value="50"><span>50</span></label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Price Range</h3>
+                <div class="price-filter">
+                    <input type="range" class="price-slider" min="0" max="1000" step="10" value="1000">
+                    <div class="price-values">
+                        <span>₪0</span>
+                        <span>₪1000</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="products-section">
+            <div class="results-info">
+                Showing 0 results
+            </div>
+            <div class="products-grid">
+                <!-- Products will be loaded here dynamically -->
+            </div>
+        </main>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="js/results.js"></script>
+    <script src="js/homepage.js"></script>
+    <script type="module">
+        import ProductComponent from './productComponent.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ProductComponent.init();
+            loadProducts();
+        });
+
+        function loadProducts() {
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get('category');
+            const brand = params.get('brand');
+
+            fetch(`/api/shoes?category=${category}&brand=${brand}`)
+                .then(response => response.json())
+                .then(products => {
+                    console.log("Products fetched:", products); 
+                    const productsGrid = document.querySelector('.products-grid');
+                    productsGrid.innerHTML = '';
+
+                    products.forEach(product => {
+                        productsGrid.innerHTML += ProductComponent.createProductCard(product);
+                    });
+
+                    ProductComponent.initializeProductCards();
+                })
+                .catch(error => console.error('Error fetching products:', error));
+        }
+        
+        
+
+        // Mock API response to simulate the products data for Nike in Men's category
+        window.fetch = (originalFetch => {
+            return (...args) => {
+                if (args[0].startsWith('/api/shoes')) {
+                    return Promise.resolve({
+                        json: () => Promise.resolve([
+                            {
+                                colors: [],
+                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f66495f9-83c6-46db-9a17-3b24c89d4bbc/M+NIKE+AIR+ZOOM+TR+1.png",
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/6c03092d-3d7d-4fcb-8fba-355def643091/M+NIKE+AIR+ZOOM+TR+1.png"
+                                 ],
+                                _id: "67256c7347fdfd6834210712",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Nike Air Zoom Pegasus 39",
+                                description: "Men's running shoes with responsive cushioning and breathable upper.",
+                                price: 120,
+                                stock: 50,
+                                sizes: [8, 9, 10, 11, 12],
+                                color: "Black/White",
+                                addedDate: "2024-11-02T00:08:22.798Z"
+                            },
+                            {
+                                colors: [],
+                                images: [
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/c66fe625-183c-44c1-97a7-055e63514784/AIR+ZOOM+PEGASUS+41+FP.png",
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/d8dab828-b829-474c-8388-d466b1d3df23/AIR+ZOOM+PEGASUS+41+FP.png"
+                                ],
+                                _id: "67256c7347fdfd6834210712",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Nike Air Zoom Pegasus 41",
+                                description: "Men's running shoes with responsive cushioning and breathable upper.",
+                                price: 120,
+                                stock: 50,
+                                sizes: [8, 9, 10, 11, 12],
+                                color: "Black/White",
+                                addedDate: "2024-11-02T00:08:22.798Z"
+                            },
+                            {
+                                colors: [],
+                                images: [
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/30d7afaa-343b-4439-b65d-bb544c65420e/NIKE+REVOLUTION+7.png",
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/583324fa-7cd9-483c-9b5d-0c9c8d4c4303/NIKE+REVOLUTION+7.png"
+                                ],
+                                _id: "67256c7347fdfd6834210713",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Nike Revolution 5",
+                                description: "Men's running shoes with lightweight cushioning for comfort during runs.",
+                                price: 75,
+                                stock: 60,
+                                sizes: [7, 8, 9, 10, 11, 12],
+                                color: "Blue/White",
+                                addedDate: "2024-11-02T00:08:22.813Z"
+                            },
+                            {
+                                colors: [],
+                                images: [
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5577c8c4-5fd2-43b7-a613-aa808251f6f7/FLEX+EXPERIENCE+RN+12.png",
+                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f22bfaec-1215-4eea-a034-c00fc8a68ccd/FLEX+EXPERIENCE+RN+12.png"
+                                ],
+                                _id: "67256c7347fdfd6834210714",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Nike Flex Experience Run 12",
+                                description: "Men's running shoes with flexible outsole and cushioned comfort.",
+                                price: 65,
+                                stock: 45,
+                                sizes: [8, 9, 10, 11, 12],
+                                color: "Gray/Black",
+                                addedDate: "2024-11-02T00:08:22.814Z"
+                            },
+                            {
+                                colors: [],
+                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/12a2f74f-b392-4ff1-8d15-480de194bd0c/AIR+ZOOM+PEGASUS+41.png",
+                                  "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5a024bdc-496e-4d53-9627-8d2812872121/AIR+ZOOM+PEGASUS+41.png"  
+                                ],
+                                _id: "67256c7347fdfd6834210716",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Nike Zoom Pegasus 41",
+                                description: "Cushioned running shoes with a lightweight and supportive design.",
+                                price: 65,
+                                stock: 70,
+                                sizes: [7, 8, 9, 10, 11, 12],
+                                color: "Blue/White",
+                                addedDate: "2024-11-02T00:08:22.815Z"
+                            },
+                            {
+                                colors: [],
+                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/d54d997f-2ae0-44be-98f7-c179b60020a9/AIR+JORDAN+1+MID.png"
+                                    ,"https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/60a4dabb-32f3-4d71-a534-75d641717ffd/AIR+JORDAN+1+MID.png"
+                                ],
+                                _id: "67256c7347fdfd6834210717",
+                                category: "Men",
+                                brand: "Nike",
+                                name: "Air Jordan 1 Mid",
+                                description: "Compression shorts designed for support and freedom of movement during training.",
+                                price: 25,
+                                stock: 80,
+                                color: "blue",
+                                addedDate: "2024-11-02T00:08:22.816Z"
+                            }
+                        ])
+                    });
+                }
+                return originalFetch(...args);
+            };
+        })(window.fetch);
+    </script>
+</body>
+</html>
