@@ -1762,3 +1762,106 @@ body {
     border: 1px solid #ced4da;
     border-radius: 0.25rem;
 }
+/* עיצוב כללי לכל הכפתורים בטבלה */
+.btn-warning,
+.btn-danger,
+.btn-primary,
+.btn-secondary {
+    background-color: black !important;
+    color: red !important;
+    border: none !important;
+}
+
+.btn-warning:hover,
+.btn-danger:hover,
+.btn-primary:hover,
+.btn-secondary:hover {
+    background-color: #333 !important; /* שחור מעט יותר בהיר בהובר */
+    color: #ff3333 !important; /* אדום מעט יותר בהיר בהובר */
+}
+
+/* עיצוב ספציפי לכפתורי Edit ו-Delete */
+.btn-warning.btn-sm,
+.btn-danger.btn-sm {
+    background-color: black !important;
+    color: red !important;
+    border: none !important;
+    margin: 2px !important;
+    padding: 5px 10px !important;
+}
+
+/* עיצוב כפתור Add New Shoe */
+.btn-primary {
+    background-color: black !important;
+    color: red !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    margin-bottom: 15px !important;
+}
+
+/* עיצוב כפתורי המודל */
+.modal-footer .btn {
+    background-color: black !important;
+    color: red !important;
+    border: none !important;
+}
+/* עיצוב לכפתורי הקטגוריות הראשיות */
+.admin-card .btn {
+    background-color: black !important;
+    color: red !important;
+    border: none !important;
+    width: 100%;
+    padding: 10px 20px !important;
+    transition: all 0.3s ease;
+}
+
+/* עיצוב ספציפי לכל כפתור */
+.admin-card .btn.blue,
+.admin-card .btn.yellow,
+.admin-card .btn.black,
+.admin-card .btn.red {
+    background-color: black !important;
+    color: red !important;
+}
+
+/* אפקט hover לכפתורים */
+.admin-card .btn:hover {
+    opacity: 0.8;
+    transform: translateY(-2px);
+}
+
+/* עיצוב למצב active של הכפתורים */
+.admin-card .btn:active {
+    transform: translateY(0);
+}
+.shoe-image {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+/* עיצוב לטבלה */
+.table td {
+    vertical-align: middle;
+}
+
+/* עיצוב לתא התמונה */
+.table td:first-child {
+    width: 70px;
+    text-align: center;
+}
+/* עיצוב התא של התמונה */
+.table td:first-child {
+    width: 100px;  /* רוחב קבוע לתא */
+    height: 100px; /* גובה קבוע לתא */
+    padding: 0 !important; /* מבטל ריווח פנימי */
+}
+
+/* עיצוב התמונה עצמה */
+.table td:first-child img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* התמונה תכסה את כל השטח */
+    display: block; /* מונע רווחים מיותרים */
+}

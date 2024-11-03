@@ -4,7 +4,7 @@ function showLoading(tableId) {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center">
+                <td colspan="8" class="text-center">  <!-- שינוי מ-7 ל-8 -->
                     <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
@@ -19,14 +19,13 @@ function showError(tableId, message) {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="text-center text-danger">
+                <td colspan="8" class="text-center text-danger">  <!-- שינוי מ-7 ל-8 -->
                     ${message}
                 </td>
             </tr>
         `;
     }
 }
-
 // API Functions
 async function loadShoes() {
     showLoading('shoes');
@@ -39,6 +38,12 @@ async function loadShoes() {
         if (tbody) {
             tbody.innerHTML = shoes.map(shoe => `
                 <tr>
+                    <td>
+                       <img 
+    src="${shoe.images && shoe.images[0] ? shoe.images[0] : '/images/no-image.jpg'}" 
+    alt="${shoe.name}"
+>
+                    </td>
                     <td>${shoe._id}</td>
                     <td>${shoe.brand || '-'}</td>
                     <td>${shoe.name}</td>
