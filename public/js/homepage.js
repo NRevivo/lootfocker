@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', async function() {
     // פונקציה לטעינת ה-header וה-footer בצורה דינאמית
     async function loadContent(url, containerId, callback) {

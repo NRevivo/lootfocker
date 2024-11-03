@@ -14,7 +14,7 @@ const shoeSchema = new mongoose.Schema({
   category: String,
   brand: String,
   sizes: [Number],
-  colors: [String],
+  color: String,
   stock: {
     type: Number,
     required: true,

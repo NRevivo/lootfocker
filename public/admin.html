@@ -4,20 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loot Focker - Admin</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Scripts -->
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<<<<<<< HEAD
     <script src="js/admin.js"></script>
+=======
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+>>>>>>> 24de1466b1014b5cd3d988f5944d9241b569a54c
     <script src="js/homepage.js"></script>
-
+    <script src="js/admin.js"></script>
 </head>
 <body>
-    <!-- Placeholder for header -->
+    <!-- Header -->
     <div id="header-container"></div>
 
     <!-- Admin Panel -->
     <main class="admin-panel">
         <h1>Admin Dashboard</h1>
+        
+        <!-- Admin Cards Section -->
         <div class="admin-sections">
             <div class="admin-card">
                 <h2>Shoes Edit Section</h2>
@@ -41,13 +52,197 @@
             </div>
         </div>
 
-        <!-- Data display section -->
-        <div class="data-display" id="data-display">
-            <!-- Data will be displayed here dynamically -->
+        <!-- Dynamic Tables Section -->
+        <div class="data-display-section" style="margin: 2rem auto; width: 90%; display: none;">
+            <!-- Shoes Table -->
+            <div id="shoesTable" class="dynamic-table" style="display: none;">
+                <h2 class="text-center mb-4">Shoes Inventory</h2>
+                <div class="text-end mb-3">
+                    <button class="btn btn-primary" onclick="openAddShoeModal()">Add New Shoe</button>
+                </div>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Image</th>              <!-- עמודה חדשה -->
+                            <th>ID</th>
+                            <th>Brand</th>
+                            <th>Model</th>
+                            <th>Price</th>
+                            <th>Size</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shoesTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Users Table -->
+            <div id="usersTable" class="dynamic-table" style="display: none;">
+                <h2 class="text-center mb-4">Users List</h2>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Registration Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Orders Table -->
+            <div id="ordersTable" class="dynamic-table" style="display: none;">
+                <h2 class="text-center mb-4">Orders List</h2>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody"></tbody>
+                </table>
+            </div>
+
+            <!-- Grouped Orders Table -->
+            <div id="groupedOrdersTable" class="dynamic-table" style="display: none;">
+                <h2 class="text-center mb-4">Orders by User</h2>
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Username</th>
+                            <th>Total Orders</th>
+                            <th>Total Amount</th>
+                            <th>Average Order Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="groupedOrdersTableBody"></tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- Add Shoe Modal -->
+        <div class="modal fade" id="addShoeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add New Shoe</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addShoeForm">
+                            <div class="mb-3">
+                                <label class="form-label">Name</label>
+                                <input type="text" class="form-control" id="shoeName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="shoeDescription"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Price</label>
+                                <input type="number" class="form-control" id="shoePrice" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <input type="text" class="form-control" id="shoeCategory">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Brand</label>
+                                <input type="text" class="form-control" id="shoeBrand">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Sizes (comma separated)</label>
+                                <input type="text" class="form-control" id="shoeSizes" placeholder="42, 43, 44">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Colors (comma separated)</label>
+                                <input type="text" class="form-control" id="shoeColors" placeholder="Black, White, Red">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Stock</label>
+                                <input type="number" class="form-control" id="shoeStock" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Images (comma separated URLs)</label>
+                                <input type="text" class="form-control" id="shoeImages" placeholder="url1.jpg, url2.jpg">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="submitNewShoe()">Add Shoe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Edit Shoe Modal -->
+<div class="modal fade" id="editShoeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Shoe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editShoeForm">
+                    <input type="hidden" id="editShoeId">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editShoeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="editShoeDescription"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" id="editShoePrice" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <input type="text" class="form-control" id="editShoeCategory">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Brand</label>
+                        <input type="text" class="form-control" id="editShoeBrand">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sizes (comma separated)</label>
+                        <input type="text" class="form-control" id="editShoeSizes" placeholder="42, 43, 44">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <input type="text" class="form-control" id="editShoeColor">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock</label>
+                        <input type="number" class="form-control" id="editShoeStock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Images (comma separated URLs)</label>
+                        <input type="text" class="form-control" id="editShoeImages">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateShoe()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
     </main>
 
-    <!-- Placeholder for footer -->
+    <!-- Footer -->
     <div id="footer-container"></div>
 
     <script>

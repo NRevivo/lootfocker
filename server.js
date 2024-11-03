@@ -44,7 +44,22 @@ connectToDB().then(() => {
       res.status(500).send('Server Error');
     }
   });
+// Route to get a single shoe by ID
+app.get('/api/shoes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const shoe = await Shoe.findById(id);
+    
+    if (!shoe) {
+      return res.status(404).send('Shoe not found');
+    }
 
+    res.json(shoe);
+  } catch (err) {
+    console.error('Error fetching shoe:', err);
+    res.status(500).send('Server Error');
+  }
+});
   // Route to create a new shoe
   app.post('/api/shoes', async (req, res) => {
     try {
@@ -292,31 +307,40 @@ connectToDB().then(() => {
   // Route to filter shoes
   app.get('/api/shoes/filter', async (req, res) => {
     try {
-      const { category, brand, sizes, minPrice, maxPrice } = req.query;
-      let filter = {};
+        const { category, brand, sizes, minPrice, maxPrice } = req.query;
+        let filter = {};
+        
+        // פילטור לפי קטגוריה
+        if (category) {
+            filter.category = category;
+        }
+        
+        // פילטור לפי מותג
+        if (brand) {
+            filter.brand = { $in: brand.split(',') };
+        }
+        
+        // פילטור לפי מידות
+        if (sizes) {
+            filter.sizes = { $in: sizes.split(',').map(Number) };
+        }
+        
+        // פילטור לפי מחיר
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
 
-      if (category) {
-        filter.category = category;
-      }
-      if (brand) {
-        filter.brand = { $in: brand.split(',') };
-      }
-      if (sizes) {
-        filter.sizes = { $in: sizes.split(',').map(Number) };
-      }
-      if (minPrice || maxPrice) {
-        filter.price = {};
-        if (minPrice) filter.price.$gte = Number(minPrice);
-        if (maxPrice) filter.price.$lte = Number(maxPrice);
-      }
+        console.log('Applied filter:', filter);
 
-      const shoes = await Shoe.find(filter);
-      res.json(shoes);
+        const shoes = await Shoe.find(filter);
+        res.json(shoes);
     } catch (err) {
-      console.error('Filter error:', err);
-      res.status(500).send('Server Error');
+        console.error('Filter error:', err);
+        res.status(500).send('Server Error');
     }
-  });
+});
 
   // Route to get distinct brands
   app.get('/api/shoes/brands', async (req, res) => {
@@ -342,21 +366,44 @@ connectToDB().then(() => {
     }
   });
 
-  app.get('/api/shoes', (req, res) => {
-    const { category, brand } = req.query;
+ // Routes for Shoes
+app.route('/api/shoes')
+.get(async (req, res) => { // Get all shoes or filter shoes
+  try {
+    const { category, brand, sizes, minPrice, maxPrice } = req.query;  // קבלת הפרמטרים מהבקשה
 
-    // סינון מוצרים ממסד הנתונים לפי הקטגוריה והמותג
-    let filteredShoes = shoes; // מתוך db.js
-
-    if (category) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.category === category);
+    let filter = {};
+    if (category) filter.category = category; // סינון לפי קטגוריה
+    if (brand) filter.brand = { $in: brand.split(',') }; // סינון לפי מותג
+    if (sizes) filter.sizes = { $in: sizes.split(',').map(Number) }; // סינון לפי מידות
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice); // סינון לפי מחיר מינימלי
+      if (maxPrice) filter.price.$lte = Number(maxPrice); // סינון לפי מחיר מקסימלי
     }
-    if (brand) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.brand === brand);
-    }
 
-    res.json(filteredShoes);
+    const shoes = await Shoe.find(filter);  // שליפת המוצרים מהמסד נתונים לפי הפילטרים
+    res.json(shoes);  // החזרת המוצרים כתגובה
+  } catch (err) {
+    console.error('Error fetching shoes:', err);
+    res.status(500).send('Internal Server Error');
+  }
+})
+.post(async (req, res) => { // Create a new shoe
+  try {
+    const { name, description, price, category, brand, sizes, color, stock, images } = req.body;
+    if (!name || !price || !stock) {
+      return res.status(400).send('Name, price, and stock are required.');
+    }
+    const shoe = new Shoe({ name, description, price, category, brand, sizes, color, stock, images });
+    await shoe.save();
+    res.status(201).send(shoe);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
 });
+
+
 
   // Start the server
   server.listen(port, () => {
