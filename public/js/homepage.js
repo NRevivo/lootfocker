@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     function initializeHeader() {
         updateAuthButton();
         loadAdminButtonIfNeeded();
+        loadPersonalAreaButtonIfNeeded(); // קריאה לפונקציה להוספת כפתור "אזור אישי" במידת הצורך
         initializeEventListeners();
     }
 
@@ -38,19 +39,28 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     function addAdminButton() {
-        if (sessionStorage.getItem("isAdmin") === "true") {
-            const navLinks = document.querySelector(".nav-links");
-            if (!navLinks) {
-                console.error("Nav links not found");
-                return;
-            }
+        const navLinks = document.querySelector(".nav-links");
+        if (!document.querySelector(".admin-link")) {
+            const adminItem = document.createElement("li");
+            adminItem.classList.add("menu-item", "admin-link");
+            adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
+            navLinks.appendChild(adminItem);
+        }
+    }
 
-            if (!document.querySelector(".admin-link")) {
-                const adminItem = document.createElement("li");
-                adminItem.classList.add("menu-item", "admin-link");
-                adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
-                navLinks.appendChild(adminItem);
-            }
+    function loadPersonalAreaButtonIfNeeded() {
+        if (sessionStorage.getItem('isLoggedIn') === "true") {
+            addPersonalButton();
+        }
+    }
+
+    function addPersonalButton() {
+        const navLinks = document.querySelector(".nav-links");
+        if (!document.querySelector(".personal-area-link")) {
+            const personalAreaItem = document.createElement("li");
+            personalAreaItem.classList.add("menu-item", "personal-area-link");
+            personalAreaItem.innerHTML = `<a href="personalarea.html" class ="personalarea-button">Personal Area</a>`;
+            navLinks.appendChild(personalAreaItem);
         }
     }
 

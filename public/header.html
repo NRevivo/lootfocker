@@ -1,3 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loot Focker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+</head>
+<body>
+
 <header class="sticky-header">
     <nav>
         <a href="homepage.html" class="logo">Loot Focker</a>
@@ -26,18 +38,26 @@
                     </ul>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a href="/results.html?category=Kids">Kids</a>
+                    <a href="/results.html?category=Boy">Boys</a>
                     <ul class="submenu">
-                        <li><a href="/results.html?category=Kids&subcategory=Boys">Boys</a></li>
-                        <li><a href="/results.html?category=Kids&subcategory=Girls">Girls</a></li>
-                        <li><a href="/results.html?category=Kids&subcategory=Baby">Baby</a></li>
+                        <li><a href="/results.html?category=Boy&brand=Nike">Nike</a></li>
+                        <li><a href="/results.html?category=Boy&brand=Adidas">Adidas</a></li>
+                        <li><a href="/results.html?category=Boy&brand=New%20Balance">New Balance</a></li>
+                        <li><a href="/results.html?category=Boy&brand=Converse">Converse</a></li>
+                        <li><a href="/results.html?category=Boy&brand=Puma">Puma</a></li>
+                        <li><a href="/results.html?category=Boy&brand=Vans">Vans</a></li>
                     </ul>
                 </li>
-                <li class="menu-item">
-                    <a href="/results.html?sort=newest">New Arrivals</a>
-                </li>
-                <li class="menu-item">
-                    <a href="/results.html?onSale=true">Sale</a>
+                <li class="menu-item has-submenu">
+                    <a href="/results.html?category=Girl">Girls</a>
+                    <ul class="submenu">
+                        <li><a href="/results.html?category=Girl&brand=Nike">Nike</a></li>
+                        <li><a href="/results.html?category=Girl&brand=Adidas">Adidas</a></li>
+                        <li><a href="/results.html?category=Girl&brand=New%20Balance">New Balance</a></li>
+                        <li><a href="/results.html?category=Girl&brand=Converse">Converse</a></li>
+                        <li><a href="/results.html?category=Girl&brand=Puma">Puma</a></li>
+                        <li><a href="/results.html?category=Girl&brand=Vans">Vans</a></li>
+                    </ul>
                 </li>
             </ul>
         </nav>
@@ -46,15 +66,12 @@
             <button type="submit" class="search"><i class="fas fa-search"></i></button>
         </div>
 
-        <!-- Updated login/logout button -->
         <div class="login-register">
             <a href="#" id="authButton">Login/Register</a>
         </div>
         
-        <!-- Greeting message -->
         <div class="greeting-message" id="greetingMessage" style="color: white; font-weight: bold;"></div>
 
-        <!-- Shopping Cart Icon -->
         <div class="shopping-cart">
             <a href="#" class="cart-icon" id="cartToggle">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -71,7 +88,6 @@
                     <span class="close-cart" id="closeCart">×</span>
                 </div>
                 <div class="cart-items">
-                    <!-- Empty cart state -->
                     <div class="empty-cart">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.12 6.12L3 6l2.67 10.68a2 2 0 0 0 2 1.32h8.66a2 2 0 0 0 2-1.32L20.12 6.12z"/>
@@ -98,6 +114,16 @@
     </nav>
 </header>
 
+<!-- קטע וידאו -->
+<div class="header-video-container">
+    <video autoplay loop muted playsinline class="header-video">
+        <source src="images/video_lootfocker_1.mp4" type="video/mp4">
+        הדפדפן שלך לא תומך בתג וידאו.
+    </video>
+    <div class="header-video-overlay"></div> <!-- שכבת ההצללה -->
+</div>
+
+
 <!-- Login Modal -->
 <div id="loginModal" class="modal" style="display: none;">
     <div class="modal-content">
@@ -122,188 +148,89 @@
     </div>
 </div>
 
+<script src="js/personalarea.js"></script>
+<script src="js/homepage.js"></script>
+
 <script>
-     function initializeHeader() {
-        updateAuthButton();
-        loadAdminButtonIfNeeded();
-        initializeEventListeners();
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize header state
+    updateAuthButton();
+    loadAdminButtonIfNeeded();
+    initializeHeaderEvents();
 
     function updateAuthButton() {
         const authButton = document.getElementById('authButton');
-        const greetingMessage = document.querySelector('.greetingMessage');
-        console.log('Greeting message element:', greetingMessage); // לבדיקה
-
         if (sessionStorage.getItem('isLoggedIn') === "true") {
             authButton.textContent = 'Logout';
-            const userEmail = sessionStorage.getItem('email');
-            console.log('User email:', userEmail); // לבדיקה
-
-            if (userEmail && greetingMessage) {
-                const userName = userEmail.split('@')[0];
-                greetingMessage.innerHTML = `שלום ${userName}`;
-                greetingMessage.style.display = 'inline-block';
-                console.log('Updated greeting message'); // לבדיקה
-            }
         } else {
             authButton.textContent = 'Login/Register';
-            if (greetingMessage) {
-                greetingMessage.innerHTML = '';
-                greetingMessage.style.display = 'none';
-            }
         }
     }
-    
-    function updateGreetingMessage() {
-    const greetingMessage = document.getElementById('greetingMessage');
-    if (sessionStorage.getItem('isLoggedIn') === "true") {
-        const email = sessionStorage.getItem('email');
-        const name = email ? email.split('@')[0] : 'User'; // Extracting name from email
-        greetingMessage.textContent = `Hello, ${name}`;
-    } else {
-        greetingMessage.textContent = '';
-    }
-}
-
 
     function loadAdminButtonIfNeeded() {
         if (sessionStorage.getItem('isLoggedIn') === "true" && 
             sessionStorage.getItem('isAdmin') === "true") {
-            addAdminButton();
-        }
-    }
-
-    function addAdminButton() {
-        if (sessionStorage.getItem("isAdmin") === "true") {
             const navLinks = document.querySelector(".nav-links");
-            if (!navLinks) {
-                console.error("Nav links not found");
-                return;
-            }
+            if (!navLinks) return;
 
             if (!document.querySelector(".admin-link")) {
-                console.log("Adding admin button...");
                 const adminItem = document.createElement("li");
                 adminItem.classList.add("menu-item", "admin-link");
-                adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
+                adminItem.innerHTML = '<a href="admin.html" class="admin-button">Admin</a>';
                 navLinks.appendChild(adminItem);
             }
         }
     }
 
-    function initializeEventListeners() {
-        // Modal functionality
+    function initializeHeaderEvents() {
+        // Modal Events
         const modal = document.getElementById("loginModal");
-        const loginLink = document.querySelector(".login-register a");
+        const authButton = document.getElementById("authButton");
         const closeModal = document.querySelector(".close");
 
-        if (modal) {
-            modal.style.display = "none";
-            
-            if (loginLink) {
-                loginLink.addEventListener("click", function(event) {
-                    event.preventDefault();
-                    if (sessionStorage.getItem('isLoggedIn') === "true") {
-                        sessionStorage.removeItem('isLoggedIn');
-                        sessionStorage.removeItem('isAdmin');
-                        sessionStorage.removeItem('email');
-                        updateAuthButton();
-                        updateGreetingMessage(); 
-                        location.reload();
-                    } else {
-                        modal.style.display = "flex";
-                    }
-                });
+        authButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (sessionStorage.getItem('isLoggedIn') === "true") {
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('isAdmin');
+                sessionStorage.removeItem('email');
+                updateAuthButton();
+                window.location.reload();
+            } else {
+                modal.style.display = 'flex';
             }
+        });
 
-            if (closeModal) {
-                closeModal.addEventListener("click", function() {
-                    modal.style.display = "none";
-                });
+        closeModal.addEventListener('click', () => modal.style.display = "none");
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
             }
+        });
 
-            window.addEventListener("click", function(event) {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            });
-        }
-
-        // Cart functionality
+        // Cart Events
         const cartToggle = document.getElementById('cartToggle');
         const cartDropdown = document.getElementById('cartDropdown');
         const closeCart = document.getElementById('closeCart');
 
-        if (cartToggle && cartDropdown) {
-            cartToggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                cartDropdown.classList.toggle('active');
-            });
+        cartToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            cartDropdown.classList.toggle('active');
+        });
 
-            if (closeCart) {
-                closeCart.addEventListener('click', function() {
-                    cartDropdown.classList.remove('active');
-                });
+        closeCart.addEventListener('click', () => 
+            cartDropdown.classList.remove('active')
+        );
+
+        document.addEventListener('click', function(e) {
+            if (!cartDropdown.contains(e.target) && !cartToggle.contains(e.target)) {
+                cartDropdown.classList.remove('active');
             }
-
-            document.addEventListener('click', function(e) {
-                if (!cartDropdown.contains(e.target) && !cartToggle.contains(e.target)) {
-                    cartDropdown.classList.remove('active');
-                }
-            });
-        }
-
-        // Login form handler
-        const loginForm = document.getElementById('loginForm');
-        if (loginForm) {
-            loginForm.addEventListener("submit", async function(event) {
-                event.preventDefault();
-
-                const email = event.target.email.value;
-                const password = event.target.password.value;
-
-                try {
-                    const response = await fetch('/login', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ email, password })
-                    });
-
-                    const data = await response.json();
-
-                    if (response.ok) {
-                        sessionStorage.setItem("isLoggedIn", "true");
-                        sessionStorage.setItem("email", email);
-
-                        if (data.role === "admin") {
-                            sessionStorage.setItem("isAdmin", "true");
-                        } else {
-                            sessionStorage.removeItem("isAdmin");
-                        }
-
-                        alert("התחברת בהצלחה!");
-                        updateGreetingMessage();
-                        location.reload();
-                    } else {
-                        alert(data.message);
-                    }
-                } catch (err) {
-                    console.error("Error during login:", err);
-                    alert("An error occurred while logging in.");
-                }
-
-                modal.style.display = "none";
-                event.target.reset();
-            });
-        }
+        });
     }
-
-    // Initialize header when content is loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeHeader);
-    } else {
-        initializeHeader();
-    }
+});
 </script>
+
+</body>
+</html>
