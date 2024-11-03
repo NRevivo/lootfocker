@@ -342,21 +342,44 @@ connectToDB().then(() => {
     }
   });
 
-  app.get('/api/shoes', (req, res) => {
-    const { category, brand } = req.query;
+ // Routes for Shoes
+app.route('/api/shoes')
+.get(async (req, res) => { // Get all shoes or filter shoes
+  try {
+    const { category, brand, sizes, minPrice, maxPrice } = req.query;  // קבלת הפרמטרים מהבקשה
 
-    // סינון מוצרים ממסד הנתונים לפי הקטגוריה והמותג
-    let filteredShoes = shoes; // מתוך db.js
-
-    if (category) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.category === category);
+    let filter = {};
+    if (category) filter.category = category; // סינון לפי קטגוריה
+    if (brand) filter.brand = { $in: brand.split(',') }; // סינון לפי מותג
+    if (sizes) filter.sizes = { $in: sizes.split(',').map(Number) }; // סינון לפי מידות
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice); // סינון לפי מחיר מינימלי
+      if (maxPrice) filter.price.$lte = Number(maxPrice); // סינון לפי מחיר מקסימלי
     }
-    if (brand) {
-        filteredShoes = filteredShoes.filter(shoe => shoe.brand === brand);
-    }
 
-    res.json(filteredShoes);
+    const shoes = await Shoe.find(filter);  // שליפת המוצרים מהמסד נתונים לפי הפילטרים
+    res.json(shoes);  // החזרת המוצרים כתגובה
+  } catch (err) {
+    console.error('Error fetching shoes:', err);
+    res.status(500).send('Internal Server Error');
+  }
+})
+.post(async (req, res) => { // Create a new shoe
+  try {
+    const { name, description, price, category, brand, sizes, color, stock, images } = req.body;
+    if (!name || !price || !stock) {
+      return res.status(400).send('Name, price, and stock are required.');
+    }
+    const shoe = new Shoe({ name, description, price, category, brand, sizes, color, stock, images });
+    await shoe.save();
+    res.status(201).send(shoe);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
 });
+
+
 
   // Start the server
   server.listen(port, () => {

@@ -1,13 +1,109 @@
 // results.js
-console.log('Results.js loaded successfully');
-console.log("Script Loaded");
-
-
 import ProductComponent from './productComponent.js';
+
+
+function initializeHeader() {
+    const authButton = document.getElementById('authButton');
+    if (authButton) {
+        if (sessionStorage.getItem('isLoggedIn') === "true") {
+            authButton.textContent = 'Logout';
+        } else {
+            authButton.textContent = 'Login/Register';
+        }
+
+        authButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (sessionStorage.getItem('isLoggedIn') === "true") {
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('isAdmin');
+                sessionStorage.removeItem('email');
+                window.location.reload();
+            } else {
+                document.getElementById('loginModal').style.display = 'flex';
+            }
+        });
+    }
+
+    // אתחול המודל
+    const modal = document.getElementById("loginModal");
+    const closeModal = document.querySelector(".close");
+    const loginForm = document.getElementById("loginForm");
+
+    if (closeModal && modal) {
+        closeModal.addEventListener('click', () => modal.style.display = "none");
+        
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionStorage.setItem("isLoggedIn", "true");
+                    sessionStorage.setItem("email", email);
+
+                    if (data.role === "admin") {
+                        sessionStorage.setItem("isAdmin", "true");
+                    }
+
+                    alert("התחברת בהצלחה!");
+                    window.location.reload();
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error("Error during login:", err);
+                alert("An error occurred while logging in.");
+            }
+        });
+    }
+
+    // אתחול העגלה
+    const cartToggle = document.getElementById('cartToggle');
+    const cartDropdown = document.getElementById('cartDropdown');
+    const closeCart = document.getElementById('closeCart');
+
+    if (cartToggle && cartDropdown) {
+        cartToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            cartDropdown.classList.toggle('active');
+        });
+
+        if (closeCart) {
+            closeCart.addEventListener('click', () => 
+                cartDropdown.classList.remove('active')
+            );
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!cartDropdown.contains(e.target) && !cartToggle.contains(e.target)) {
+                cartDropdown.classList.remove('active');
+            }
+        });
+    }
+}
+
 
 class ResultsPage {
     constructor() {
-        // Get initial filters from URL parameters
         this.urlParams = new URLSearchParams(window.location.search);
         this.filters = {
             category: this.urlParams.get('category') || '',
@@ -16,234 +112,237 @@ class ResultsPage {
             minPrice: null,
             maxPrice: null
         };
+        
+        // Log initial filters
+        console.log('Initial filters:', this.filters);
     }
 
     async init() {
-        // Initialize product component
-        ProductComponent.init();
-        
-        // Load content and setup page
-        await loadContent('header.html', 'header-container');
-        await loadContent('footer.html', 'footer-container');
-        
-        await this.initializeFilters();
-        await this.loadProducts();
-        this.setupFilterListeners();
-        this.updateBreadcrumbs();
+        try {
+            // Initialize product component
+            await ProductComponent.init();
+            
+            // Load content
+            await this.loadContent('header.html', 'header-container');
+            await this.loadContent('footer.html', 'footer-container');
+            
+            // Initialize filters and load products
+            await this.initializeFilters();
+            await this.loadProducts();
+            
+            // Setup event listeners
+            this.setupFilterListeners();
+            this.updateBreadcrumbs();
+            
+            console.log('Page initialized successfully');
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
     }
 
-    updateBreadcrumbs() {
-        const breadcrumbs = document.getElementById('breadcrumbs');
-        let html = '<a href="/">Home</a>';
-        
-        if (this.filters.category) {
-            html += ` > <a href="/results.html?category=${this.filters.category}">${this.filters.category}</a>`;
+    async loadProducts() {
+        try {
+            // Build query parameters
+            const params = new URLSearchParams();
+            
+            if (this.filters.category) {
+                params.append('category', this.filters.category);
+            }
+            if (this.filters.brand.length) {
+                params.append('brand', this.filters.brand.join(','));
+            }
+            if (this.filters.sizes.length) {
+                params.append('sizes', this.filters.sizes.join(','));
+            }
+            if (this.filters.minPrice !== null) {
+                params.append('minPrice', this.filters.minPrice);
+            }
+            if (this.filters.maxPrice !== null) {
+                params.append('maxPrice', this.filters.maxPrice);
+            }
+            
+            console.log('Fetching products with params:', params.toString());
+            
+            // Fetch products
+            const response = await fetch(`/api/shoes/filter?${params.toString()}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const products = await response.json();
+            console.log('Fetched products:', products);
+            
+            // Update results count
+            const resultsInfo = document.querySelector('.results-info');
+            if (resultsInfo) {
+                resultsInfo.textContent = `Showing ${products.length} results`;
+            }
+            
+            // Render products
+            const container = document.querySelector('.products-grid');
+            if (!container) {
+                console.error('Products grid container not found');
+                return;
+            }
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p class="no-results">No products found matching your criteria.</p>';
+                return;
+            }
+            
+            // Use ProductComponent to create product cards
+            container.innerHTML = products
+                .map(product => ProductComponent.createProductCard(product))
+                .join('');
+            
+            // Initialize product cards
+            ProductComponent.initializeProductCards();
+            
+        } catch (error) {
+            console.error('Error loading products:', error);
+            const container = document.querySelector('.products-grid');
+            if (container) {
+                container.innerHTML = '<p class="error-message">Error loading products. Please try again later.</p>';
+            }
         }
-        
-        if (this.filters.brand.length) {
-            html += ` > ${this.filters.brand.join(', ')}`;
-        }
-        
-        breadcrumbs.innerHTML = html;
     }
 
     async initializeFilters() {
         try {
-            // Load brands (filtered by category if exists)
+            // Load brands based on category
             const brandsUrl = this.filters.category ? 
                 `/api/shoes/brands?category=${this.filters.category}` : 
                 '/api/shoes/brands';
             
             const brandsResponse = await fetch(brandsUrl);
             const brands = await brandsResponse.json();
-
-            // Render brand filters
-            const brandFilters = document.getElementById('brandFilters');
-            brandFilters.innerHTML = brands.map(brand => `
-                <div class="filter-option">
-                    <input type="checkbox" 
-                           id="brand-${brand}" 
-                           value="${brand}"
-                           ${this.filters.brand.includes(brand) ? 'checked' : ''}>
-                    <label for="brand-${brand}">${brand}</label>
-                </div>
-            `).join('');
-
+            
+            // Update brand filters
+            const brandsList = document.querySelector('.brands-list');
+            if (brandsList) {
+                brandsList.innerHTML = brands.map(brand => `
+                    <div class="filter-option">
+                        <input type="checkbox" 
+                               id="brand-${brand}" 
+                               value="${brand}"
+                               ${this.filters.brand.includes(brand) ? 'checked' : ''}>
+                        <label for="brand-${brand}">${brand}</label>
+                    </div>
+                `).join('');
+            }
+            
             // Setup size filters
-            const sizes = Array.from({ length: 13 }, (_, i) => i + 38); // Sizes 38-50
-            const sizeFilters = document.getElementById('sizeFilters');
-            sizeFilters.innerHTML = sizes.map(size => `
-                <div class="filter-option">
-                    <input type="checkbox" id="size-${size}" value="${size}">
-                    <label for="size-${size}">${size}</label>
-                </div>
-            `).join('');
-
+            const sizeOptions = document.querySelector('.size-options');
+            if (sizeOptions) {
+                const sizes = Array.from({ length: 13 }, (_, i) => i + 38); // Sizes 38-50
+                sizeOptions.innerHTML = sizes.map(size => `
+                    <div class="filter-option">
+                        <input type="checkbox" 
+                               id="size-${size}" 
+                               value="${size}"
+                               ${this.filters.sizes.includes(size) ? 'checked' : ''}>
+                        <label for="size-${size}">${size}</label>
+                    </div>
+                `).join('');
+            }
         } catch (error) {
             console.error('Error initializing filters:', error);
         }
     }
 
-    async loadProducts() {
-    try {
-        const params = new URLSearchParams();
-        
-        // הוספת הפילטרים לפרמטרים
-        if (this.filters.category) {
-            params.append('category', this.filters.category);
-        }
-        if (this.filters.brand.length) {
-            params.append('brand', this.filters.brand.join(','));
-        }
-        if (this.filters.sizes.length) {
-            params.append('sizes', this.filters.sizes.join(','));
-        }
-        if (this.filters.minPrice !== null) {
-            params.append('minPrice', this.filters.minPrice);
-        }
-        if (this.filters.maxPrice !== null) {
-            params.append('maxPrice', this.filters.maxPrice);
-        }
-
-        // טעינת המוצרים המסוננים
-        const response = await fetch(`/api/shoes/filter?${params.toString()}`);
-        const products = await response.json();
-
-        // עדכון מספר התוצאות
-        document.querySelector('.results-info').textContent = 
-            `Showing ${products.length} results`;
-
-        // רינדור המוצרים באמצעות ProductComponent
-        const container = document.querySelector('.products-grid');
-        if (products.length === 0) {
-            container.innerHTML = '<p>No products found matching your criteria.</p>';
-            return;
-        }
-
-        // שימוש ב-ProductComponent ליצירת כרטיסי המוצרים
-        container.innerHTML = products
-            .map(product => ProductComponent.createProductCard(product))
-            .join('');
-
-        // אתחול האינטראקציות של כרטיסי המוצרים
-        ProductComponent.initializeProductCards();
-
-    } catch (error) {
-        console.error('Error loading products:', error);
-        document.querySelector('.products-grid').innerHTML = 
-            '<p>Error loading products. Please try again later.</p>';
-    }
-}
-
     setupFilterListeners() {
         // Brand filter changes
-        document.getElementById('brandFilters').addEventListener('change', e => {
-            if (e.target.type === 'checkbox') {
-                if (e.target.checked) {
-                    this.filters.brand.push(e.target.value);
-                } else {
-                    this.filters.brand = this.filters.brand
-                        .filter(b => b !== e.target.value);
+        const brandsList = document.querySelector('.brands-list');
+        if (brandsList) {
+            brandsList.addEventListener('change', e => {
+                if (e.target.type === 'checkbox') {
+                    if (e.target.checked) {
+                        this.filters.brand.push(e.target.value);
+                    } else {
+                        this.filters.brand = this.filters.brand
+                            .filter(b => b !== e.target.value);
+                    }
+                    this.loadProducts();
                 }
-                this.loadProducts();
-            }
-        });
+            });
+        }
 
         // Size filter changes
-        document.getElementById('sizeFilters').addEventListener('change', e => {
-            if (e.target.type === 'checkbox') {
-                const size = Number(e.target.value);
-                if (e.target.checked) {
-                    this.filters.sizes.push(size);
-                } else {
-                    this.filters.sizes = this.filters.sizes
-                        .filter(s => s !== size);
+        const sizeOptions = document.querySelector('.size-options');
+        if (sizeOptions) {
+            sizeOptions.addEventListener('change', e => {
+                if (e.target.type === 'checkbox') {
+                    const size = Number(e.target.value);
+                    if (e.target.checked) {
+                        this.filters.sizes.push(size);
+                    } else {
+                        this.filters.sizes = this.filters.sizes
+                            .filter(s => s !== size);
+                    }
+                    this.loadProducts();
                 }
-                this.loadProducts();
-            }
-        });
+            });
+        }
 
         // Price range changes
-        const minPrice = document.getElementById('minPrice');
-        const maxPrice = document.getElementById('maxPrice');
-        const minDisplay = document.getElementById('minPriceDisplay');
-        const maxDisplay = document.getElementById('maxPriceDisplay');
-
-        minPrice.addEventListener('input', e => {
-            minDisplay.textContent = `₪${e.target.value}`;
-        });
-
-        maxPrice.addEventListener('input', e => {
-            maxDisplay.textContent = `₪${e.target.value}`;
-        });
-
-        minPrice.addEventListener('change', e => {
-            this.filters.minPrice = Number(e.target.value);
-            this.loadProducts();
-        });
-
-        maxPrice.addEventListener('change', e => {
-            this.filters.maxPrice = Number(e.target.value);
-            this.loadProducts();
-        });
+        const priceFilter = document.querySelector('.price-filter');
+        if (priceFilter) {
+            const range = priceFilter.querySelector('input[type="range"]');
+            if (range) {
+                range.addEventListener('change', e => {
+                    this.filters.maxPrice = Number(e.target.value);
+                    this.loadProducts();
+                });
+            }
+        }
     }
-}
 
-// Helper function for loading content
-async function loadContent(url, containerId) {
-    try {
-        const response = await fetch(url);
-        const data = await response.text();
-        document.getElementById(containerId).innerHTML = data;
-    } catch (error) {
-        console.error(`Error loading ${url}:`, error);
+    updateBreadcrumbs() {
+        const breadcrumbs = document.getElementById('breadcrumbs');
+        if (breadcrumbs) {
+            let html = '<a href="/">Home</a>';
+            
+            if (this.filters.category) {
+                html += ` > <a href="/results.html?category=${this.filters.category}">${this.filters.category}</a>`;
+            }
+            
+            if (this.filters.brand.length) {
+                html += ` > ${this.filters.brand.join(', ')}`;
+            }
+            
+            breadcrumbs.innerHTML = html;
+        }
+    }
+
+    async loadContent(url, containerId) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.text();
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = data;
+            }
+            if (containerId === 'header-container') {
+                initializeHeader();
+            }
+        } catch (error) {
+            console.error(`Error loading ${url}:`, error);
+        }
     }
 }
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Initializing Results Page');
     const page = new ResultsPage();
-    page.init();
+    page.init().catch(error => {
+        console.error('Error initializing page:', error);
+    });
 });
 
-async function loadProducts() {
-    const params = new URLSearchParams(window.location.search);
-    const category = params.get('category');
-    const brand = params.get('brand');
 
-    console.log('Loading products with category:', category, 'and brand:', brand);
 
-    try {
-        // Fetch products based on category and brand
-        const response = await fetch(`/api/shoes?category=${category}&brand=${brand}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const products = await response.json();
-
-        console.log('Fetched products:', products);
-
-        // Update the page with the fetched products
-        const productsGrid = document.querySelector('.products-grid');
-        productsGrid.innerHTML = '';
-
-        if (products.length === 0) {
-            productsGrid.innerHTML = '<p>No products found matching your criteria.</p>';
-        } else {
-            products.forEach(product => {
-                productsGrid.innerHTML += ProductComponent.createProductCard(product);
-            });
-
-            // Initialize product cards
-            ProductComponent.initializeProductCards();
-        }
-    } catch (error) {
-        console.error('Error loading products:', error);
-        document.querySelector('.products-grid').innerHTML = '<p>Error loading products. Please try again later.</p>';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-});
-
+export default ResultsPage;
