@@ -24,59 +24,19 @@ function initializeHeader() {
         });
     }
 
-    // אתחול המודל
-    const modal = document.getElementById("loginModal");
-    const closeModal = document.querySelector(".close");
-    const loginForm = document.getElementById("loginForm");
-
-    if (closeModal && modal) {
-        closeModal.addEventListener('click', () => modal.style.display = "none");
-        
-        window.addEventListener('click', (event) => {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        });
+    // Admin Button functionality
+    if (sessionStorage.getItem('isLoggedIn') === "true" && 
+        sessionStorage.getItem('isAdmin') === "true") {
+        const navLinks = document.querySelector(".nav-links");
+        if (navLinks && !document.querySelector(".admin-link")) {
+            const adminItem = document.createElement("li");
+            adminItem.classList.add("menu-item", "admin-link");
+            adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
+            navLinks.appendChild(adminItem);
+        }
     }
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    sessionStorage.setItem("isLoggedIn", "true");
-                    sessionStorage.setItem("email", email);
-
-                    if (data.role === "admin") {
-                        sessionStorage.setItem("isAdmin", "true");
-                    }
-
-                    alert("התחברת בהצלחה!");
-                    window.location.reload();
-                } else {
-                    alert(data.message);
-                }
-            } catch (err) {
-                console.error("Error during login:", err);
-                alert("An error occurred while logging in.");
-            }
-        });
-    }
-
-    // אתחול העגלה
+    // Cart functionality
     const cartToggle = document.getElementById('cartToggle');
     const cartDropdown = document.getElementById('cartDropdown');
     const closeCart = document.getElementById('closeCart');

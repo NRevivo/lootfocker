@@ -44,22 +44,7 @@ connectToDB().then(() => {
       res.status(500).send('Server Error');
     }
   });
-// Route to get a single shoe by ID
-app.get('/api/shoes/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const shoe = await Shoe.findById(id);
-    
-    if (!shoe) {
-      return res.status(404).send('Shoe not found');
-    }
 
-    res.json(shoe);
-  } catch (err) {
-    console.error('Error fetching shoe:', err);
-    res.status(500).send('Server Error');
-  }
-});
   // Route to create a new shoe
   app.post('/api/shoes', async (req, res) => {
     try {
