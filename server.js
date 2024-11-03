@@ -292,31 +292,40 @@ connectToDB().then(() => {
   // Route to filter shoes
   app.get('/api/shoes/filter', async (req, res) => {
     try {
-      const { category, brand, sizes, minPrice, maxPrice } = req.query;
-      let filter = {};
+        const { category, brand, sizes, minPrice, maxPrice } = req.query;
+        let filter = {};
+        
+        // פילטור לפי קטגוריה
+        if (category) {
+            filter.category = category;
+        }
+        
+        // פילטור לפי מותג
+        if (brand) {
+            filter.brand = { $in: brand.split(',') };
+        }
+        
+        // פילטור לפי מידות
+        if (sizes) {
+            filter.sizes = { $in: sizes.split(',').map(Number) };
+        }
+        
+        // פילטור לפי מחיר
+        if (minPrice || maxPrice) {
+            filter.price = {};
+            if (minPrice) filter.price.$gte = Number(minPrice);
+            if (maxPrice) filter.price.$lte = Number(maxPrice);
+        }
 
-      if (category) {
-        filter.category = category;
-      }
-      if (brand) {
-        filter.brand = { $in: brand.split(',') };
-      }
-      if (sizes) {
-        filter.sizes = { $in: sizes.split(',').map(Number) };
-      }
-      if (minPrice || maxPrice) {
-        filter.price = {};
-        if (minPrice) filter.price.$gte = Number(minPrice);
-        if (maxPrice) filter.price.$lte = Number(maxPrice);
-      }
+        console.log('Applied filter:', filter);
 
-      const shoes = await Shoe.find(filter);
-      res.json(shoes);
+        const shoes = await Shoe.find(filter);
+        res.json(shoes);
     } catch (err) {
-      console.error('Filter error:', err);
-      res.status(500).send('Server Error');
+        console.error('Filter error:', err);
+        res.status(500).send('Server Error');
     }
-  });
+});
 
   // Route to get distinct brands
   app.get('/api/shoes/brands', async (req, res) => {

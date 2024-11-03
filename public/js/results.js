@@ -142,28 +142,34 @@ class ResultsPage {
 
     async loadProducts() {
         try {
-            // Build query parameters
             const params = new URLSearchParams();
             
+            // עדכון הלוגיקה לקטגוריות החדשות
             if (this.filters.category) {
-                params.append('category', this.filters.category);
+                // בדיקה אם זו אחת מהקטגוריות הראשיות
+                if (['Men', 'Women', 'Boys', 'Girls'].includes(this.filters.category)) {
+                    params.append('category', this.filters.category);
+                }
             }
+            
             if (this.filters.brand.length) {
                 params.append('brand', this.filters.brand.join(','));
             }
+            
             if (this.filters.sizes.length) {
                 params.append('sizes', this.filters.sizes.join(','));
             }
+            
             if (this.filters.minPrice !== null) {
                 params.append('minPrice', this.filters.minPrice);
             }
+            
             if (this.filters.maxPrice !== null) {
                 params.append('maxPrice', this.filters.maxPrice);
             }
             
             console.log('Fetching products with params:', params.toString());
             
-            // Fetch products
             const response = await fetch(`/api/shoes/filter?${params.toString()}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -172,14 +178,14 @@ class ResultsPage {
             const products = await response.json();
             console.log('Fetched products:', products);
             
-            // Update results count
+            // הצגת התוצאות
+            const container = document.querySelector('.products-grid');
             const resultsInfo = document.querySelector('.results-info');
+            
             if (resultsInfo) {
                 resultsInfo.textContent = `Showing ${products.length} results`;
             }
             
-            // Render products
-            const container = document.querySelector('.products-grid');
             if (!container) {
                 console.error('Products grid container not found');
                 return;
@@ -190,12 +196,10 @@ class ResultsPage {
                 return;
             }
             
-            // Use ProductComponent to create product cards
             container.innerHTML = products
                 .map(product => ProductComponent.createProductCard(product))
                 .join('');
             
-            // Initialize product cards
             ProductComponent.initializeProductCards();
             
         } catch (error) {
