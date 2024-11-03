@@ -340,3 +340,93 @@ function submitNewShoe() {
         alert('Failed to add shoe. Please try again.');
     });
 }
+// פונקציה שנקראת כשלוחצים על כפתור Edit
+async function editShoe(id) {
+    try {
+        const response = await fetch(`/api/shoes/${id}`);
+        if (!response.ok) throw new Error('Failed to load shoe');
+        const shoe = await response.json();
+        
+        // מילוי הטופס בנתונים הקיימים
+        document.getElementById('editShoeId').value = shoe._id;
+        document.getElementById('editShoeName').value = shoe.name || '';
+        document.getElementById('editShoeDescription').value = shoe.description || '';
+        document.getElementById('editShoePrice').value = shoe.price || '';
+        document.getElementById('editShoeCategory').value = shoe.category || '';
+        document.getElementById('editShoeBrand').value = shoe.brand || '';
+        document.getElementById('editShoeSizes').value = shoe.sizes ? shoe.sizes.join(', ') : '';
+        document.getElementById('editShoeColor').value = shoe.color || '';
+        document.getElementById('editShoeStock').value = shoe.stock || '';
+        document.getElementById('editShoeImages').value = shoe.images ? shoe.images.join(', ') : '';
+
+        // פתיחת המודל
+        const modal = new bootstrap.Modal(document.getElementById('editShoeModal'));
+        modal.show();
+    } catch (error) {
+        console.error('Error loading shoe details:', error);
+        alert('Failed to load shoe details. Please try again.');
+    }
+}
+
+// פונקציה לשמירת השינויים
+async function updateShoe() {
+    const id = document.getElementById('editShoeId').value;
+    
+    // איסוף כל הנתונים מהטופס
+    const name = document.getElementById('editShoeName').value;
+    const description = document.getElementById('editShoeDescription').value;
+    const price = document.getElementById('editShoePrice').value;
+    const category = document.getElementById('editShoeCategory').value;
+    const brand = document.getElementById('editShoeBrand').value;
+    const sizesStr = document.getElementById('editShoeSizes').value;
+    const color = document.getElementById('editShoeColor').value;
+    const stock = document.getElementById('editShoeStock').value;
+    const imagesStr = document.getElementById('editShoeImages').value;
+
+    // המרת מחרוזות מופרדות בפסיקים למערכים
+    const sizes = sizesStr.split(',').map(size => Number(size.trim())).filter(Boolean);
+    const images = imagesStr.split(',').map(url => url.trim()).filter(Boolean);
+
+    // יצירת אובייקט הנעל המעודכן
+    const shoeData = {
+        name,
+        description,
+        price: Number(price),
+        category,
+        brand,
+        sizes,
+        color,
+        stock: Number(stock),
+        images
+    };
+
+    // וולידציה של שדות חובה
+    if (!shoeData.name || !shoeData.price || !shoeData.stock) {
+        alert('Name, price and stock are required fields');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/shoes/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(shoeData)
+        });
+        
+        if (!response.ok) throw new Error('Failed to update shoe');
+        
+        // סגירת המודל
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editShoeModal'));
+        modal.hide();
+        
+        // טעינה מחדש של הטבלה
+        loadShoes();
+        
+        alert('Shoe updated successfully!');
+    } catch (error) {
+        console.error('Error updating shoe:', error);
+        alert('Failed to update shoe. Please try again.');
+    }
+}

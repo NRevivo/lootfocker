@@ -179,6 +179,62 @@
                 </div>
             </div>
         </div>
+        <!-- Edit Shoe Modal -->
+<div class="modal fade" id="editShoeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Shoe</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editShoeForm">
+                    <input type="hidden" id="editShoeId">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editShoeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" id="editShoeDescription"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Price</label>
+                        <input type="number" class="form-control" id="editShoePrice" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Category</label>
+                        <input type="text" class="form-control" id="editShoeCategory">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Brand</label>
+                        <input type="text" class="form-control" id="editShoeBrand">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Sizes (comma separated)</label>
+                        <input type="text" class="form-control" id="editShoeSizes" placeholder="42, 43, 44">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Color</label>
+                        <input type="text" class="form-control" id="editShoeColor">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Stock</label>
+                        <input type="number" class="form-control" id="editShoeStock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Images (comma separated URLs)</label>
+                        <input type="text" class="form-control" id="editShoeImages">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="updateShoe()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
     </main>
 
     <!-- Footer -->
