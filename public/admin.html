@@ -244,18 +244,19 @@
 
     <script>
         // Load header and footer dynamically
-        function loadContent(url, containerId) {
+        function loadContent(url, containerId, callback) {
             fetch(url)
                 .then(response => response.text())
                 .then(data => {
                     document.getElementById(containerId).innerHTML = data;
+                    if (callback) callback(); // קריאה חזרה לאחר טעינת התוכן
                 })
                 .catch(error => console.error(`Error loading ${url}:`, error));
         }
-
-        // Load header and footer
-        loadContent('header.html', 'header-container');
+    
+        // Load header and footer with callback to initialize events
+        loadContent('header.html', 'header-container', initializeHeaderEvents);
         loadContent('footer.html', 'footer-container');
-    </script>
+    </script>    
 </body>
 </html>
