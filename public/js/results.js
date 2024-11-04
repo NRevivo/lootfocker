@@ -1,8 +1,33 @@
 // results.js
 import ProductComponent from './productComponent.js';
 
+// Helper function to load content with callback support
+async function loadContent(url, containerId, callback) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.text();
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = data;
+            if (callback) callback();
+        }
+    } catch (error) {
+        console.error(`Error loading ${url}:`, error);
+    }
+}
 
+// Header initialization and related functions
 function initializeHeader() {
+    updateAuthButton();
+    loadAdminButtonIfNeeded();
+    loadPersonalAreaButtonIfNeeded();
+    initializeEventListeners();
+}
+
+function updateAuthButton() {
     const authButton = document.getElementById('authButton');
     if (authButton) {
         if (sessionStorage.getItem('isLoggedIn') === "true") {
@@ -10,30 +35,68 @@ function initializeHeader() {
         } else {
             authButton.textContent = 'Login/Register';
         }
+    }
+}
 
-        authButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            if (sessionStorage.getItem('isLoggedIn') === "true") {
-                sessionStorage.removeItem('isLoggedIn');
-                sessionStorage.removeItem('isAdmin');
-                sessionStorage.removeItem('email');
-                window.location.reload();
-            } else {
-                document.getElementById('loginModal').style.display = 'flex';
+function loadAdminButtonIfNeeded() {
+    if (sessionStorage.getItem('isLoggedIn') === "true" && sessionStorage.getItem('isAdmin') === "true") {
+        addAdminButton();
+    }
+}
+
+function addAdminButton() {
+    const navLinks = document.querySelector(".nav-links");
+    if (!document.querySelector(".admin-link")) {
+        const adminItem = document.createElement("li");
+        adminItem.classList.add("menu-item", "admin-link");
+        adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
+        navLinks.appendChild(adminItem);
+    }
+}
+
+function loadPersonalAreaButtonIfNeeded() {
+    if (sessionStorage.getItem('isLoggedIn') === "true") {
+        addPersonalButton();
+    }
+}
+
+function addPersonalButton() {
+    const navLinks = document.querySelector(".nav-links");
+    if (!document.querySelector(".personal-area-link")) {
+        const personalAreaItem = document.createElement("li");
+        personalAreaItem.classList.add("menu-item", "personal-area-link");
+        personalAreaItem.innerHTML = `<a href="personalarea.html" class="personalarea-button">Personal Area</a>`;
+        navLinks.appendChild(personalAreaItem);
+    }
+}
+
+function initializeEventListeners() {
+    // Modal functionality
+    const modal = document.getElementById("loginModal");
+    const loginLink = document.querySelector(".login-register a");
+    const closeModal = document.querySelector(".close");
+
+    if (modal) {
+        modal.style.display = "none";
+        
+        if (loginLink) {
+            loginLink.addEventListener("click", function(event) {
+                event.preventDefault();
+                modal.style.display = "flex";
+            });
+        }
+
+        if (closeModal) {
+            closeModal.addEventListener("click", function() {
+                modal.style.display = "none";
+            });
+        }
+
+        window.addEventListener("click", function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
             }
         });
-    }
-
-    // Admin Button functionality
-    if (sessionStorage.getItem('isLoggedIn') === "true" && 
-        sessionStorage.getItem('isAdmin') === "true") {
-        const navLinks = document.querySelector(".nav-links");
-        if (navLinks && !document.querySelector(".admin-link")) {
-            const adminItem = document.createElement("li");
-            adminItem.classList.add("menu-item", "admin-link");
-            adminItem.innerHTML = `<a href="admin.html" class="admin-button">Admin</a>`;
-            navLinks.appendChild(adminItem);
-        }
     }
 
     // Cart functionality
@@ -48,9 +111,9 @@ function initializeHeader() {
         });
 
         if (closeCart) {
-            closeCart.addEventListener('click', () => 
-                cartDropdown.classList.remove('active')
-            );
+            closeCart.addEventListener('click', function() {
+                cartDropdown.classList.remove('active');
+            });
         }
 
         document.addEventListener('click', function(e) {
@@ -59,9 +122,71 @@ function initializeHeader() {
             }
         });
     }
+
+    // Auth Button functionality
+    const authButton = document.getElementById('authButton');
+    if (authButton) {
+        authButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            if (sessionStorage.getItem('isLoggedIn') === "true") {
+                sessionStorage.removeItem('isLoggedIn');
+                sessionStorage.removeItem('isAdmin');
+                sessionStorage.removeItem('email');
+                updateAuthButton();
+                window.location.reload();
+            } else {
+                modal.style.display = 'flex';
+            }
+        });
+    }
+
+    // Handle login form submission
+    const loginForm = document.querySelector("#loginFormElement");
+    if (loginForm) {
+        loginForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const email = event.target.email.value;
+            const password = event.target.password.value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, password: password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    sessionStorage.setItem("isLoggedIn", "true");
+                    sessionStorage.setItem("email", email);
+
+                    if (data.role === "admin") {
+                        sessionStorage.setItem("isAdmin", "true");
+                    } else {
+                        sessionStorage.removeItem("isAdmin");
+                    }
+
+                    alert("התחברת בהצלחה!");
+                    window.location.href = '/homepage.html';
+                } else {
+                    alert(data.message);
+                }
+            } catch (err) {
+                console.error("Error during login:", err);
+                alert("An error occurred while logging in.");
+            }
+
+            event.target.reset();
+            modal.style.display = "none";
+        });
+    }
 }
 
-
+// Main ResultsPage class
 class ResultsPage {
     constructor() {
         this.urlParams = new URLSearchParams(window.location.search);
@@ -73,7 +198,6 @@ class ResultsPage {
             maxPrice: null
         };
         
-        // Log initial filters
         console.log('Initial filters:', this.filters);
     }
 
@@ -82,9 +206,9 @@ class ResultsPage {
             // Initialize product component
             await ProductComponent.init();
             
-            // Load content
-            await this.loadContent('header.html', 'header-container');
-            await this.loadContent('footer.html', 'footer-container');
+            // Load content with proper initialization
+            await loadContent('header.html', 'header-container', initializeHeader);
+            await loadContent('footer.html', 'footer-container');
             
             // Initialize filters and load products
             await this.initializeFilters();
@@ -104,10 +228,9 @@ class ResultsPage {
         try {
             const params = new URLSearchParams();
             
-            // עדכון הלוגיקה לקטגוריות החדשות
             if (this.filters.category) {
-                // בדיקה אם זו אחת מהקטגוריות הראשיות
-                if (['Men', 'Women', 'Boys', 'Girls'].includes(this.filters.category)) {
+                const mainCategories = ['Men', 'Women', 'Boy', 'Girl', 'Baby'];
+                if (mainCategories.includes(this.filters.category)) {
                     params.append('category', this.filters.category);
                 }
             }
@@ -138,7 +261,6 @@ class ResultsPage {
             const products = await response.json();
             console.log('Fetched products:', products);
             
-            // הצגת התוצאות
             const container = document.querySelector('.products-grid');
             const resultsInfo = document.querySelector('.results-info');
             
@@ -173,7 +295,6 @@ class ResultsPage {
 
     async initializeFilters() {
         try {
-            // Load brands based on category
             const brandsUrl = this.filters.category ? 
                 `/api/shoes/brands?category=${this.filters.category}` : 
                 '/api/shoes/brands';
@@ -181,7 +302,6 @@ class ResultsPage {
             const brandsResponse = await fetch(brandsUrl);
             const brands = await brandsResponse.json();
             
-            // Update brand filters
             const brandsList = document.querySelector('.brands-list');
             if (brandsList) {
                 brandsList.innerHTML = brands.map(brand => `
@@ -195,7 +315,6 @@ class ResultsPage {
                 `).join('');
             }
             
-            // Setup size filters
             const sizeOptions = document.querySelector('.size-options');
             if (sizeOptions) {
                 const sizes = Array.from({ length: 13 }, (_, i) => i + 38); // Sizes 38-50
@@ -277,25 +396,6 @@ class ResultsPage {
             breadcrumbs.innerHTML = html;
         }
     }
-
-    async loadContent(url, containerId) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.text();
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = data;
-            }
-            if (containerId === 'header-container') {
-                initializeHeader();
-            }
-        } catch (error) {
-            console.error(`Error loading ${url}:`, error);
-        }
-    }
 }
 
 // Initialize the page
@@ -306,7 +406,5 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Error initializing page:', error);
     });
 });
-
-
 
 export default ResultsPage;
