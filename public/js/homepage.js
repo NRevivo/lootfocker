@@ -1,29 +1,82 @@
+import ProductComponent from './productComponent.js';
 
-document.addEventListener('DOMContentLoaded', async function() {
-    // פונקציה לטעינת ה-header וה-footer בצורה דינאמית
-    async function loadContent(url, containerId, callback) {
+class HomePage {
+    constructor() {
+        this.init();
+    }
+
+    async init() {
+        try {
+            // אתחול ה-ProductComponent
+            await ProductComponent.init();
+            
+            // טעינת ה-header וה-footer
+            await this.loadContent('header.html', 'header-container', this.initializeHeader);
+            await this.loadContent('footer.html', 'footer-container');
+            
+            // טעינת המוצרים
+            await this.loadLatestProducts();
+        } catch (error) {
+            console.error('Error during initialization:', error);
+        }
+    }
+
+    async loadContent(url, containerId, callback) {
         try {
             const response = await fetch(url);
             const data = await response.text();
             document.getElementById(containerId).innerHTML = data;
-            if (callback) callback(); // קריאה חזרה לפונקציה לאחר הטעינה
+            if (callback) callback();
         } catch (error) {
             console.error(`Error loading ${url}:`, error);
         }
     }
 
-    // טעינת ה-header וה-footer
-    await loadContent('header.html', 'header-container', initializeHeader);
-    await loadContent('footer.html', 'footer-container');
+    async loadLatestProducts() {
+        try {
+            const response = await fetch('/api/shoes/latest');
+            if (!response.ok) {
+                throw new Error('Failed to fetch latest products');
+            }
+            
+            const products = await response.json();
+            const productGrid = document.querySelector('.product-grid');
+            
+            if (!productGrid) {
+                console.error('Product grid container not found');
+                return;
+            }
 
-    // פונקציה לאתחול מאזינים ל-header לאחר טעינתו
-    function initializeHeader() {
-        updateAuthButton();
-        loadAdminButtonIfNeeded();
-        loadPersonalAreaButtonIfNeeded(); // קריאה לפונקציה להוספת כפתור "אזור אישי" במידת הצורך
-        initializeEventListeners();
+            // ניקוי הגריד הקיים
+            productGrid.innerHTML = '';
+
+            if (products && products.length > 0) {
+                // יצירת הכרטיסים
+                products.forEach(product => {
+                    productGrid.innerHTML += ProductComponent.createProductCard(product);
+                });
+
+                // אתחול האינטראקציות
+                ProductComponent.initializeProductCards();
+            } else {
+                productGrid.innerHTML = '<p class="no-results">No products available at the moment.</p>';
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            const productGrid = document.querySelector('.product-grid');
+            if (productGrid) {
+                productGrid.innerHTML = '<p class="error-message">Error loading products. Please try again later.</p>';
+            }
+        }
     }
 
+    initializeHeader() {
+        updateAuthButton();
+        loadAdminButtonIfNeeded();
+        loadPersonalAreaButtonIfNeeded();
+        initializeEventListeners();
+    }
+}
     function updateAuthButton() {
         const authButton = document.getElementById('authButton');
         if (sessionStorage.getItem('isLoggedIn') === "true") {
@@ -60,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (!document.querySelector(".personal-area-link")) {
             const personalAreaItem = document.createElement("li");
             personalAreaItem.classList.add("menu-item", "personal-area-link");
-            personalAreaItem.innerHTML = `<a href="personalarea.html" class ="personalarea-button">Personal Area</a>`;
+            personalAreaItem.innerHTML = `<a href="personalarea.html" class="personalarea-button">Personal Area</a>`;
             navLinks.appendChild(personalAreaItem);
         }
     }
@@ -179,4 +232,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
     }
-});
+    document.addEventListener('DOMContentLoaded', () => {
+        new HomePage();
+    });
+    
+    export default HomePage;

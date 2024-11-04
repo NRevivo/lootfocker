@@ -337,6 +337,24 @@ app.get('/api/shoes/filter', async (req, res) => {
       res.status(500).send('Server Error');
   }
 });
+
+
+// הוסף את הנתיב הזה בקובץ server.js
+app.get('/api/shoes/latest', async (req, res) => {
+  try {
+      const latestShoes = await Shoe.find()
+          .sort({ addedDate: -1 }) // מיון לפי תאריך הוספה בסדר יורד
+          .limit(4);               // הגבלה ל-4 מוצרים אחרונים
+      res.json(latestShoes);
+  } catch (err) {
+      console.error('Error fetching latest shoes:', err);
+      res.status(500).send('Server Error');
+  }
+});
+
+
+
+
   // Route to get distinct brands
   app.get('/api/shoes/brands', async (req, res) => {
     try {
