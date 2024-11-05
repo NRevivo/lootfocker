@@ -277,19 +277,6 @@
 
     <script type="module" src="js/results.js"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const headerContainer = document.getElementById('header-container');
-            fetch('header.html')
-                .then(response => response.text())
-                .then(html => {
-                    headerContainer.innerHTML = html;
-        
-                    // קריאה לאתחול האירועים של ה־header כדי שה־modal והכפתורים יפעלו כמו שצריך
-                    initializeHeaderEvents();
-                })
-                .catch(error => console.error('Error loading header:', error));
-        });
-        </script>
+   
 </body>
 </html>

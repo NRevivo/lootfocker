@@ -322,11 +322,11 @@ app.get('/api/orders/:email', async (req, res) => {
             const role = check.role === 'admin' ? 'admin' : 'user';
             const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
 
-            // הוספת userId לתגובה
             res.status(200).json({ 
                 message: 'Login successful', 
-                role, 
-                userId: check._id, 
+                role,
+                userId: check._id,
+                fullName: check.fullName, // הוספנו את השם המלא
                 redirectUrl 
             });
         } else {
@@ -337,7 +337,6 @@ app.get('/api/orders/:email', async (req, res) => {
         res.status(500).send({ message: "Server error occurred" });
     }
 });
-
 
 // Route to filter shoes
 app.get('/api/shoes/filter', async (req, res) => {
