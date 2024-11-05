@@ -38,7 +38,7 @@ class ResultsPage {
             const params = new URLSearchParams();
             
             if (this.filters.category) {
-                if (['Men', 'Women', 'Boys', 'Girls'].includes(this.filters.category)) {
+                if (['Men', 'Women', 'Boy', 'Girl', 'Baby'].includes(this.filters.category)) {
                     params.append('category', this.filters.category);
                 }
             }
@@ -100,6 +100,7 @@ class ResultsPage {
 
     async initializeFilters() {
         try {
+            // Brand filters setup
             const brandsUrl = this.filters.category ? 
                 `/api/shoes/brands?category=${this.filters.category}` : 
                 '/api/shoes/brands';
@@ -120,24 +121,58 @@ class ResultsPage {
                 `).join('');
             }
             
+            // Size filters setup
             const sizeOptions = document.querySelector('.size-options');
             if (sizeOptions) {
-                const sizes = Array.from({ length: 13 }, (_, i) => i + 38); // Sizes 38-50
-                sizeOptions.innerHTML = sizes.map(size => `
-                    <div class="filter-option">
-                        <input type="checkbox" 
-                               id="size-${size}" 
-                               value="${size}"
-                               ${this.filters.sizes.includes(size) ? 'checked' : ''}>
-                        <label for="size-${size}">${size}</label>
-                    </div>
-                `).join('');
+                // מידות לפי קטגוריה
+                let sizes;
+                switch(this.filters.category) {
+                    case 'Men':
+                        sizes = [42, 43, 44, 45, 46];
+                        break;
+                    case 'Women':
+                        sizes = [37, 38, 39, 40, 41];
+                        break;
+                    case 'Boy':
+                        sizes = [31, 32, 33, 34, 35];
+                        break;
+                    case 'Girl':
+                        sizes = [28, 29, 30, 31, 32];
+                        break;
+                    case 'Baby':
+                        sizes = [23, 24, 25, 26, 27];
+                        break;
+                    default:
+                        sizes = []; // אם אין קטגוריה נבחרת
+                }
+    
+                // יצירת שורות של מידות (3 מידות בשורה)
+                let sizeRowsHTML = '';
+                for(let i = 0; i < sizes.length; i += 3) {
+                    const rowSizes = sizes.slice(i, i + 3);
+                    sizeRowsHTML += `
+                        <div class="size-row">
+                            ${rowSizes.map(size => `
+                                <div class="filter-option">
+                                    <input type="checkbox" 
+                                           id="size-${size}" 
+                                           value="${size}"
+                                           ${this.filters.sizes.includes(size) ? 'checked' : ''}>
+                                    <label for="size-${size}">${size}</label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+                
+                sizeOptions.innerHTML = sizeRowsHTML;
             }
         } catch (error) {
             console.error('Error initializing filters:', error);
         }
     }
 
+    
     setupFilterListeners() {
         // Brand filter changes
         const brandsList = document.querySelector('.brands-list');
@@ -174,15 +209,23 @@ class ResultsPage {
 
         // Price range changes
         const priceFilter = document.querySelector('.price-filter');
-        if (priceFilter) {
-            const range = priceFilter.querySelector('input[type="range"]');
-            if (range) {
-                range.addEventListener('change', e => {
-                    this.filters.maxPrice = Number(e.target.value);
-                    this.loadProducts();
-                });
-            }
-        }
+if (priceFilter) {
+    const range = priceFilter.querySelector('input[type="range"]');
+    const currentPriceDisplay = document.getElementById('currentPrice');
+    
+    if (range) {
+        // עדכון דינמי של התצוגה בזמן הזזת הסליידר
+        range.addEventListener('input', e => {
+            currentPriceDisplay.textContent = `$${e.target.value}`;
+        });
+
+        // סינון המוצרים כשהמשתמש משחרר את הסליידר
+        range.addEventListener('change', e => {
+            this.filters.maxPrice = Number(e.target.value);
+            this.loadProducts();
+        });
+    }
+}
     }
 
     updateBreadcrumbs() {

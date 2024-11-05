@@ -12,201 +12,211 @@
 
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-        }
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    color: #333;
+}
 
-        .results-container {
-            display: flex;
-            padding: 40px 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            gap: 40px;
-        }
+.results-container {
+    display: flex;
+    padding: 40px 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    gap: 40px;
+}
 
-        /* Filters Section Styling */
-        .filters-section {
-            width: 280px;
-            position: sticky;
-            top: 20px;
-            align-self: flex-start;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-left: 0;
-        }
+/* Filters Section Styling */
+.filters-section {
+    width: 280px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-left: 0;
+}
 
-        .filter-group {
-            margin-bottom: 35px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 25px;
-        }
+.filter-group {
+    margin-bottom: 35px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 25px;
+}
 
-        .filter-group:last-child {
-            border-bottom: none;
-        }
+.filter-group:last-child {
+    border-bottom: none;
+}
 
-        .filter-group h3 {
-            font-weight: 700;
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: #333;
-        }
+.filter-group h3 {
+    font-weight: 700;
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
 
-        /* Checkboxes Styling */
-        .filter-options label {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            cursor: pointer;
-            font-size: 15px;
-            color: #444;
-            transition: color 0.2s;
-        }
+/* עיצוב משותף לכל האפשרויות */
+.filter-option {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    cursor: pointer;
+}
 
-        .filter-options label:hover {
-            color: #000;
-        }
+.filter-option input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+}
 
-        .filter-options input[type="checkbox"] {
-            margin-right: 12px;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #ddd;
-            border-radius: 3px;
-            appearance: none;
-            -webkit-appearance: none;
-            cursor: pointer;
-            position: relative;
-        }
+.filter-option input[type="checkbox"]:checked {
+    background-color: #ff0000;
+    border-color: #ff0000;
+}
 
-        .filter-options input[type="checkbox"]:checked {
-            background-color: #000;
-            border-color: #000;
-        }
+.filter-option input[type="checkbox"]:checked::after {
+    content: '✓';
+    color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+}
 
-        .filter-options input[type="checkbox"]:checked::after {
-            content: '✓';
-            position: absolute;
-            color: white;
-            font-size: 12px;
-            left: 3px;
-            top: 0px;
-        }
+.filter-option input[type="checkbox"]:checked + span {
+    color: #ff0000;
+    font-weight: bold;
+}
 
-        /* Price Range Styling */
-        .price-filter {
-            padding: 10px 0;
-        }
+.filter-option input[type="checkbox"]:hover {
+    border-color: #ff0000;
+}
 
-        .price-slider {
-            width: 100%;
-            margin: 20px 0;
-        }
+/* עיצוב מיוחד לאזור המידות */
+.filter-options.size-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 5px;
-            background: #ddd;
-            border-radius: 5px;
-            outline: none;
-        }
+.size-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
 
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #000;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        }
+/* Price Range Styling */
+.price-filter {
+    padding: 10px 0;
+}
 
-        .price-values {
-            display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            color: #666;
-            margin-top: 10px;
-        }
+input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 5px;
+    background: #ddd;
+    border-radius: 5px;
+    outline: none;
+}
 
-        /* Results Section Styling */
-        .products-section {
-            flex: 1;
-        }
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
 
-        .results-info {
-            margin-bottom: 30px;
-            font-size: 15px;
-            color: #666;
-            padding: 15px 0;
-            border-bottom: 1px solid #eee;
-        }
+.price-values {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #666;
+    margin-top: 10px;
+}
 
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 30px;
-        }
+/* Results Section Styling */
+.products-section {
+    flex: 1;
+}
 
-        /* Product Card Styling */
-        .product-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.2s;
-            position: relative;
-        }
+.results-info {
+    margin-bottom: 30px;
+    font-size: 15px;
+    color: #666;
+    padding: 15px 0;
+    border-bottom: 1px solid #eee;
+}
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            z-index: 10;
-        }
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
 
-        .product-image {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            transition: transform 0.3s ease-in-out;
-            z-index: 1;
-            position: relative;
-        }
+/* Product Card Styling */
+.product-card {
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+    position: relative;
+}
 
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
+.product-card:hover {
+    transform: translateY(-10px);
+    z-index: 10;
+}
 
-        .product-details {
-            padding: 20px;
-            text-align: center;
-            background: #fff;
-            position: relative;
-            z-index: 2;
-        }
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1;
+    position: relative;
+}
 
-        .product-details h4 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #333;
-        }
+.product-card:hover .product-image {
+    transform: scale(1.05);
+}
 
-        .product-details p {
-            font-size: 14px;
-            color: #777;
-        }
+.product-details {
+    padding: 20px;
+    text-align: center;
+    background: #fff;
+    position: relative;
+    z-index: 2;
+}
 
-        .product-card:hover .product-details {
-            transform: translateY(0);
-            z-index: 2;
-        }
+.product-details h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.product-details p {
+    font-size: 14px;
+    color: #777;
+}
+.brands-list .filter-option {
+    margin: 15px 0;  
+    padding: 5px 0; 
+}
     </style>
 </head>
 <body>
@@ -220,41 +230,101 @@
             <div class="filter-group">
                 <h3>Brand</h3>
                 <div class="filter-options brands-list">
-                    <label><input type="checkbox" value="Nike"><span>Nike</span></label>
-                    <label><input type="checkbox" value="Adidas"><span>Adidas</span></label>
-                    <label><input type="checkbox" value="New Balance"><span>New Balance</span></label>
-                    <label><input type="checkbox" value="Converse"><span>Converse</span></label>
-                    <label><input type="checkbox" value="Puma"><span>Puma</span></label>
-                    <label><input type="checkbox" value="Vans"><span>Vans</span></label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-Adidas" value="Adidas">
+                        <span>Adidas</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-Converse" value="Converse">
+                        <span>Converse</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-NewBalance" value="New Balance">
+                        <span>New Balance</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-Nike" value="Nike">
+                        <span>Nike</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-Puma" value="Puma">
+                        <span>Puma</span>
+                    </label>
+                    <label class="filter-option">
+                        <input type="checkbox" id="brand-Vans" value="Vans">
+                        <span>Vans</span>
+                    </label>
                 </div>
             </div>
-
+            
             <div class="filter-group">
                 <h3>Size</h3>
                 <div class="filter-options size-options">
-                    <label><input type="checkbox" value="38"><span>38</span></label>
-                    <label><input type="checkbox" value="39"><span>39</span></label>
-                    <label><input type="checkbox" value="40"><span>40</span></label>
-                    <label><input type="checkbox" value="41"><span>41</span></label>
-                    <label><input type="checkbox" value="42"><span>42</span></label>
-                    <label><input type="checkbox" value="43"><span>43</span></label>
-                    <label><input type="checkbox" value="44"><span>44</span></label>
-                    <label><input type="checkbox" value="45"><span>45</span></label>
-                    <label><input type="checkbox" value="46"><span>46</span></label>
-                    <label><input type="checkbox" value="47"><span>47</span></label>
-                    <label><input type="checkbox" value="48"><span>48</span></label>
-                    <label><input type="checkbox" value="49"><span>49</span></label>
-                    <label><input type="checkbox" value="50"><span>50</span></label>
+                    <div class="size-row">
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-38" value="38">
+                            <span>38</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-39" value="39">
+                            <span>39</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-40" value="40">
+                            <span>40</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-41" value="41">
+                            <span>41</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-42" value="42">
+                            <span>42</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-43" value="43">
+                            <span>43</span>
+                        </label>
+                    </div>
+                    <div class="size-row">
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-44" value="44">
+                            <span>44</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-45" value="45">
+                            <span>45</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-46" value="46">
+                            <span>46</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-47" value="47">
+                            <span>47</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-48" value="48">
+                            <span>48</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-49" value="49">
+                            <span>49</span>
+                        </label>
+                        <label class="filter-option">
+                            <input type="checkbox" id="size-50" value="50">
+                            <span>50</span>
+                        </label>
+                    </div>
                 </div>
             </div>
-
+            
             <div class="filter-group">
                 <h3>Price Range</h3>
                 <div class="price-filter">
-                    <input type="range" class="price-slider" min="0" max="1000" step="10" value="1000">
+                    <input type="range" id="priceRange" min="0" max="300" value="300">
                     <div class="price-values">
-                        <span>₪0</span>
-                        <span>₪1000</span>
+                        <span id="currentPrice">$300</span>
                     </div>
                 </div>
             </div>
