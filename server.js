@@ -45,6 +45,48 @@ connectToDB().then(() => {
     }
   });
 
+  app.get('/api/orders/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const userOrders = await Order.find({ userId });
+      if (!userOrders.length) {
+        return res.status(404).json({ message: 'No orders found for this user' });
+      }
+      res.json(userOrders);
+    } catch (err) {
+      console.error('Error fetching user orders:', err);
+      res.status(500).send('Server Error');
+    }
+  });
+  
+
+  // Route to get orders of a specific user by email - not working
+  /*
+app.get('/api/orders/:email', async (req, res) => {
+  try {
+      const { email } = req.params;
+      
+      // מצא את המשתמש לפי כתובת האימייל
+      const user = await User.findOne({ email });
+      if (!user) {
+          console.log("User not found with email:", email);
+          return res.status(404).json({ message: 'User not found' });
+      }
+
+      console.log("User found:", user);
+
+      // מצא את ההזמנות לפי userId של המשתמש שנמצא
+      const userOrders = await Order.find({ userId: user._id });
+      console.log("Orders found for user:", userOrders);
+
+      res.json(userOrders);
+  } catch (err) {
+      console.error('Error fetching user orders:', err);
+      res.status(500).send('Server Error');
+  }
+});
+*/
+
   // Route to create a new shoe
   app.post('/api/shoes', async (req, res) => {
     try {
@@ -266,28 +308,36 @@ connectToDB().then(() => {
   // Route to login
   app.post('/login', async (req, res) => {
     try {
-      if (!req.body.email || !req.body.password) {
-        return res.status(400).send({ message: "Email and password are required" });
-      }
+        if (!req.body.email || !req.body.password) {
+            return res.status(400).send({ message: "Email and password are required" });
+        }
 
-      const check = await User.findOne({ email: req.body.email });
+        const check = await User.findOne({ email: req.body.email });
 
-      if (!check) {
-        return res.status(404).send({ message: "User not found" });
-      }
+        if (!check) {
+            return res.status(404).send({ message: "User not found" });
+        }
 
-      if (req.body.password === check.password) {
-        const role = check.role === 'admin' ? 'admin' : 'user';
-        const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
-        res.status(200).json({ message: 'Login successful', role, redirectUrl });
-      } else {
-        res.status(401).send({ message: "Incorrect password" });
-      }
+        if (req.body.password === check.password) {
+            const role = check.role === 'admin' ? 'admin' : 'user';
+            const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
+
+            // הוספת userId לתגובה
+            res.status(200).json({ 
+                message: 'Login successful', 
+                role, 
+                userId: check._id, 
+                redirectUrl 
+            });
+        } else {
+            res.status(401).send({ message: "Incorrect password" });
+        }
     } catch (e) {
-      console.error("Login error:", e);
-      res.status(500).send({ message: "Server error occurred" });
+        console.error("Login error:", e);
+        res.status(500).send({ message: "Server error occurred" });
     }
-  });
+});
+
 
 // Route to filter shoes
 app.get('/api/shoes/filter', async (req, res) => {
@@ -352,9 +402,6 @@ app.get('/api/shoes/latest', async (req, res) => {
   }
 });
 
-
-
-
   // Route to get distinct brands
   app.get('/api/shoes/brands', async (req, res) => {
     try {
@@ -416,6 +463,31 @@ app.route('/api/shoes')
   }
 });
 
+// Route to create a new order
+app.post('/api/orders', async (req, res) => {
+  try {
+      const { userId, shoes, totalAmount, shippingAddress } = req.body;
+
+      if (!userId || !shoes || !totalAmount || !shippingAddress) {
+          return res.status(400).send('All fields are required.');
+      }
+
+      const order = new Order({
+          userId,
+          shoes,
+          totalAmount,
+          shippingAddress,
+      });
+
+      await order.save();
+      res.status(201).send(order);
+
+      // Emit event to clients that a new order has been created
+      io.emit('orderCreated', order);
+  } catch (err) {
+      res.status(500).send('Server Error');
+  }
+});
 
 
   // Start the server

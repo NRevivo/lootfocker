@@ -17,8 +17,10 @@
     <script src="js/admin.js"></script>
 </head>
 <body>
-    <!-- Header -->
+    <!-- לשונית עליונה -->
+    <script src="js/header.js"></script>
     <div id="header-container"></div>
+    <!-- לשונית עליונה -->
 
     <!-- Admin Panel -->
     <main class="admin-panel">
@@ -239,24 +241,9 @@
 </div>
     </main>
 
-    <!-- Footer -->
-    <div id="footer-container"></div>
-
-    <script>
-        // Load header and footer dynamically
-        function loadContent(url, containerId, callback) {
-            fetch(url)
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById(containerId).innerHTML = data;
-                    if (callback) callback(); // קריאה חזרה לאחר טעינת התוכן
-                })
-                .catch(error => console.error(`Error loading ${url}:`, error));
-        }
-    
-        // Load header and footer with callback to initialize events
-        loadContent('header.html', 'header-container', initializeHeaderEvents);
-        loadContent('footer.html', 'footer-container');
-    </script>    
+    <!-- לשונית תחתונה -->
+	<div id="footer-container"></div>
+	<script src="js/footer.js"></script>
+	<!-- לשונית תחתונה -->
 </body>
 </html>

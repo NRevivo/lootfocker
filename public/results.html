@@ -210,7 +210,10 @@
     </style>
 </head>
 <body>
+    <!-- לשונית עליונה -->
+    <script src="js/header.js"></script>
     <div id="header-container"></div>
+    <!-- לשונית עליונה -->
 
     <div class="results-container">
         <aside class="filters-section">
@@ -267,10 +270,12 @@
         </main>
     </div>
 
-    <div id="footer-container"></div>
+<!-- לשונית תחתונה -->
+<div id="footer-container"></div>
+<script src="js/footer.js"></script>
+<!-- לשונית תחתונה -->
 
     <script type="module" src="js/results.js"></script>
-    <script src="js/homepage.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -286,148 +291,5 @@
                 .catch(error => console.error('Error loading header:', error));
         });
         </script>
-
-    <!-- <script type="module">
-        import ProductComponent from './productComponent.js';
-
-        document.addEventListener('DOMContentLoaded', () => {
-            ProductComponent.init();
-            loadProducts();
-        });
-
-        function loadProducts() {
-            const params = new URLSearchParams(window.location.search);
-            const category = params.get('category');
-            const brand = params.get('brand');
-
-            fetch(`/api/shoes?category=${category}&brand=${brand}`)
-                .then(response => response.json())
-                .then(products => {
-                    console.log("Products fetched:", products); 
-                    const productsGrid = document.querySelector('.products-grid');
-                    productsGrid.innerHTML = '';
-
-                    products.forEach(product => {
-                        productsGrid.innerHTML += ProductComponent.createProductCard(product);
-                    });
-
-                    ProductComponent.initializeProductCards();
-                })
-                .catch(error => console.error('Error fetching products:', error));
-        }
-        
-        
-
-        // Mock API response to simulate the products data for Nike in Men's category
-        window.fetch = (originalFetch => {
-            return (...args) => {
-                if (args[0].startsWith('/api/shoes')) {
-                    return Promise.resolve({
-                        json: () => Promise.resolve([
-                            {
-                                colors: [],
-                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f66495f9-83c6-46db-9a17-3b24c89d4bbc/M+NIKE+AIR+ZOOM+TR+1.png",
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/6c03092d-3d7d-4fcb-8fba-355def643091/M+NIKE+AIR+ZOOM+TR+1.png"
-                                 ],
-                                _id: "67256c7347fdfd6834210712",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Nike Air Zoom Pegasus 39",
-                                description: "Men's running shoes with responsive cushioning and breathable upper.",
-                                price: 120,
-                                stock: 50,
-                                sizes: [8, 9, 10, 11, 12],
-                                color: "Black/White",
-                                addedDate: "2024-11-02T00:08:22.798Z"
-                            },
-                            {
-                                colors: [],
-                                images: [
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/c66fe625-183c-44c1-97a7-055e63514784/AIR+ZOOM+PEGASUS+41+FP.png",
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/d8dab828-b829-474c-8388-d466b1d3df23/AIR+ZOOM+PEGASUS+41+FP.png"
-                                ],
-                                _id: "67256c7347fdfd6834210712",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Nike Air Zoom Pegasus 41",
-                                description: "Men's running shoes with responsive cushioning and breathable upper.",
-                                price: 120,
-                                stock: 50,
-                                sizes: [8, 9, 10, 11, 12],
-                                color: "Black/White",
-                                addedDate: "2024-11-02T00:08:22.798Z"
-                            },
-                            {
-                                colors: [],
-                                images: [
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/30d7afaa-343b-4439-b65d-bb544c65420e/NIKE+REVOLUTION+7.png",
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/583324fa-7cd9-483c-9b5d-0c9c8d4c4303/NIKE+REVOLUTION+7.png"
-                                ],
-                                _id: "67256c7347fdfd6834210713",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Nike Revolution 5",
-                                description: "Men's running shoes with lightweight cushioning for comfort during runs.",
-                                price: 75,
-                                stock: 60,
-                                sizes: [7, 8, 9, 10, 11, 12],
-                                color: "Blue/White",
-                                addedDate: "2024-11-02T00:08:22.813Z"
-                            },
-                            {
-                                colors: [],
-                                images: [
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5577c8c4-5fd2-43b7-a613-aa808251f6f7/FLEX+EXPERIENCE+RN+12.png",
-                                    "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/f22bfaec-1215-4eea-a034-c00fc8a68ccd/FLEX+EXPERIENCE+RN+12.png"
-                                ],
-                                _id: "67256c7347fdfd6834210714",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Nike Flex Experience Run 12",
-                                description: "Men's running shoes with flexible outsole and cushioned comfort.",
-                                price: 65,
-                                stock: 45,
-                                sizes: [8, 9, 10, 11, 12],
-                                color: "Gray/Black",
-                                addedDate: "2024-11-02T00:08:22.814Z"
-                            },
-                            {
-                                colors: [],
-                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/12a2f74f-b392-4ff1-8d15-480de194bd0c/AIR+ZOOM+PEGASUS+41.png",
-                                  "https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco/5a024bdc-496e-4d53-9627-8d2812872121/AIR+ZOOM+PEGASUS+41.png"  
-                                ],
-                                _id: "67256c7347fdfd6834210716",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Nike Zoom Pegasus 41",
-                                description: "Cushioned running shoes with a lightweight and supportive design.",
-                                price: 65,
-                                stock: 70,
-                                sizes: [7, 8, 9, 10, 11, 12],
-                                color: "Blue/White",
-                                addedDate: "2024-11-02T00:08:22.815Z"
-                            },
-                            {
-                                colors: [],
-                                images: ["https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/d54d997f-2ae0-44be-98f7-c179b60020a9/AIR+JORDAN+1+MID.png"
-                                    ,"https://static.nike.com/a/images/t_PDP_1728_v1/f_auto,q_auto:eco,u_126ab356-44d8-4a06-89b4-fcdcc8df0245,c_scale,fl_relative,w_1.0,h_1.0,fl_layer_apply/60a4dabb-32f3-4d71-a534-75d641717ffd/AIR+JORDAN+1+MID.png"
-                                ],
-                                _id: "67256c7347fdfd6834210717",
-                                category: "Men",
-                                brand: "Nike",
-                                name: "Air Jordan 1 Mid",
-                                description: "Compression shorts designed for support and freedom of movement during training.",
-                                price: 25,
-                                stock: 80,
-                                color: "blue",
-                                addedDate: "2024-11-02T00:08:22.816Z"
-                            }
-                        ])
-                    });
-                }
-                return originalFetch(...args);
-            };
-        })(window.fetch);
-    </script> -->
 </body>
 </html>

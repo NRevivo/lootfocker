@@ -1844,3 +1844,104 @@ html, body {
     object-fit: cover; /* התמונה תכסה את כל השטח */
     display: block; /* מונע רווחים מיותרים */
 }
+
+/* ---------------------- last orders ----------------------------------*/
+
+/* עיצוב כללי להזמנות */
+.orders-container {
+    text-align: right;
+    margin: 0 auto;
+    max-width: 600px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    transition: transform 0.3s ease;
+}
+
+.order-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.order-header h2 {
+    font-size: 1.2em;
+    color: #333;
+    margin: 0;
+}
+
+.status {
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.order-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.order-info {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.order-summary {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+}
+
+.order-details {
+    display: flex;
+    gap: 10px;
+}
+
+.order-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+    object-fit: cover;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* עיצוב רספונסיבי */
+@media (max-width: 768px) {
+    .order-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .order-details {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+    }
+
+    .order-image {
+        width: 40px;
+        height: 40px;
+    }
+}
