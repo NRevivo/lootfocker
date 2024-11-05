@@ -3,29 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Loot Focker - Admin</title>
+    <title>Loot Focker - Personal Area</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/personalarea.js"></script>
-    <script src="js/homepage.js"></script>
 </head>
 
 <body>
-    <!-- Header Section -->
+    <!-- לשונית עליונה -->
+    <script src="js/header.js"></script>
     <div id="header-container"></div>
+    <!-- לשונית עליונה -->
 
     <!-- Main Content -->
     <div class="main-content">
         <div class="orders-container">
             <h1>ההזמנות האחרונות שלך</h1>
+            <div id="loading-message">טוען את ההזמנות...</div>
             <div id="orders-list">
                 <!-- ההזמנות יתווספו כאן -->
             </div>
+            <div id="error-message" style="display: none; color: red;">לא הצלחנו לטעון את ההזמנות שלך. אנא נסה שוב מאוחר יותר.</div>
         </div>
     </div>
 
-    <!-- Footer Section -->
-    <div id="footer-container"></div>
+    <!-- לשונית תחתונה -->
+	<div id="footer-container"></div>
+	<script src="js/footer.js"></script>
+	<!-- לשונית תחתונה -->
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userId = sessionStorage.getItem('userId'); // נניח שה-id נשמר ב-session לאחר הכניסה
+            if (userId) {
+                try {
+                    await fetchUserOrders(userId);
+                    document.getElementById('loading-message').style.display = 'none';
+                } catch (error) {
+                    document.getElementById('loading-message').style.display = 'none';
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } else {
+                document.getElementById('orders-list').innerHTML = '<p>אנא התחבר כדי לראות את ההזמנות שלך.</p>';
+            }
+        });
+    </script>
 </body>
 </html>

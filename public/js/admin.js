@@ -39,13 +39,12 @@ async function loadShoes() {
             tbody.innerHTML = shoes.map(shoe => `
                 <tr>
                     <td>
-                        <img 
-                            src="${shoe.images && shoe.images[0] ? shoe.images[0] : '/images/no-image.jpg'}" 
-                            alt="${shoe.name}"
-                        >
+                       <img 
+    src="${shoe.images && shoe.images[0] ? shoe.images[0] : '/images/no-image.jpg'}" 
+    alt="${shoe.name}"
+>
                     </td>
                     <td>${shoe._id}</td>
-                    <td>${shoe.category || '-'}</td>  <!-- עמודה חדשה -->
                     <td>${shoe.brand || '-'}</td>
                     <td>${shoe.name}</td>
                     <td>$${shoe.price}</td>
