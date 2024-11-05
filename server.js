@@ -415,6 +415,33 @@ app.route('/api/shoes')
     res.status(500).send('Server Error');
   }
 });
+app.get('/api/sales/brands', async (req, res) => {
+  try {
+      const salesByBrand = await Order.aggregate([
+          { $unwind: '$shoes' },
+          { $group: { _id: '$shoes.brand', totalSales: { $sum: 1 } } }
+      ]);
+      
+      res.json(salesByBrand);
+  } catch (error) {
+      console.error('Error fetching sales by brand:', error);
+      res.status(500).json({ message: 'Failed to fetch sales by brand' });
+  }
+});
+
+app.get('/api/sales/categories', async (req, res) => {
+  try {
+      const salesByCategory = await Order.aggregate([
+          { $unwind: '$shoes' },
+          { $group: { _id: '$shoes.category', totalSales: { $sum: 1 } } }
+      ]);
+
+      res.json(salesByCategory);
+  } catch (error) {
+      console.error('Error fetching sales by category:', error);
+      res.status(500).json({ message: 'Failed to fetch sales by category' });
+  }
+});
 
 
 
@@ -426,3 +453,4 @@ app.route('/api/shoes')
   console.error('Failed to connect to the database:', err);
   process.exit(1);
 });
+

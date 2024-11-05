@@ -388,6 +388,7 @@ async function updateShoe() {
     const color = document.getElementById('editShoeColor').value;
     const stock = document.getElementById('editShoeStock').value;
     const imagesStr = document.getElementById('editShoeImages').value;
+    
 
     // המרת מחרוזות מופרדות בפסיקים למערכים
     const sizes = sizesStr.split(',').map(size => Number(size.trim())).filter(Boolean);
@@ -434,5 +435,199 @@ async function updateShoe() {
     } catch (error) {
         console.error('Error updating shoe:', error);
         alert('Failed to update shoe. Please try again.');
+    }
+}
+// פונקציה לטעינת הגרפים והצגת כמות דגמי נעליים לפי מותג וקטגוריה
+document.addEventListener('DOMContentLoaded', function () {
+    loadCharts(); // קריאה לטעינת הגרפים
+});
+
+// פונקציה ליצירת גרף דגמי נעליים לפי מותג
+function createBrandChart(data) {
+    const svg = d3.select("#brandChart")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 400)
+        .style("overflow", "visible");
+
+    const brandCounts = d3.rollup(data, v => v.length, d => d.brand);
+    const brands = Array.from(brandCounts.keys());
+    const counts = Array.from(brandCounts.values());
+
+    const x = d3.scaleBand()
+        .domain(brands)
+        .range([0, 400])
+        .padding(0.3);
+
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(counts) + 10])
+        .range([300, 0]);
+
+    // הוספת כותרת גרף
+    svg.append("text")
+        .attr("x", 250)
+        .attr("y", -20)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        .style("fill", "#333")
+        .text("Number of Shoe Models by Brand");
+
+    // הוספת קווי רשת מעודנים
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", "translate(50,0)")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-400).tickFormat(''))
+        .selectAll("line")
+        .style("stroke", "#e0e0e0");
+
+    // ציור עמודות עם צבע מעבר והצללה
+    svg.append("g")
+        .selectAll("rect")
+        .data(brands)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d) + 50)
+        .attr("y", d => y(brandCounts.get(d)))
+        .attr("width", x.bandwidth())
+        .attr("height", d => 300 - y(brandCounts.get(d)))
+        .attr("fill", "url(#gradientBrand)")
+        .attr("rx", 5); // קצוות מעוגלים
+
+    // הגדרת מעבר צבע לעמודות
+    svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "gradientBrand")
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "0%")
+        .attr("y2", "100%")
+        .selectAll("stop")
+        .data([
+            { offset: "0%", color: "#42a5f5" },
+            { offset: "100%", color: "#bbdefb" }
+        ])
+        .enter().append("stop")
+        .attr("offset", d => d.offset)
+        .attr("stop-color", d => d.color);
+
+    // הוספת ערכים מספריים מעל כל עמודה
+    svg.selectAll("text.value")
+        .data(brands)
+        .enter()
+        .append("text")
+        .attr("class", "value")
+        .attr("x", d => x(d) + x.bandwidth() / 2 + 50)
+        .attr("y", d => y(brandCounts.get(d)) - 10)
+        .attr("text-anchor", "middle")
+        .style("fill", "#333")
+        .style("font-weight", "bold")
+        .text(d => brandCounts.get(d));
+
+    // הוספת שמות המותגים מתחת לעמודות
+    svg.append("g")
+        .attr("transform", "translate(50,300)")
+        .call(d3.axisBottom(x));
+}
+
+// פונקציה ליצירת גרף דגמי נעליים לפי קטגוריה
+function createCategoryChart(data) {
+    const svg = d3.select("#categoryChart")
+        .append("svg")
+        .attr("width", 500)
+        .attr("height", 400)
+        .style("overflow", "visible");
+
+    const categoryCounts = d3.rollup(data, v => v.length, d => d.category);
+    const categories = Array.from(categoryCounts.keys());
+    const counts = Array.from(categoryCounts.values());
+
+    const x = d3.scaleBand()
+        .domain(categories)
+        .range([0, 400])
+        .padding(0.3);
+
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(counts) + 10])
+        .range([300, 0]);
+
+    // הוספת כותרת גרף
+    svg.append("text")
+        .attr("x", 250)
+        .attr("y", -20)
+        .attr("text-anchor", "middle")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        .style("fill", "#333")
+        .text("Number of Shoe Models by Category");
+
+    // הוספת קווי רשת מעודנים
+    svg.append("g")
+        .attr("class", "grid")
+        .attr("transform", "translate(50,0)")
+        .call(d3.axisLeft(y).ticks(6).tickSize(-400).tickFormat(''))
+        .selectAll("line")
+        .style("stroke", "#e0e0e0");
+
+    // ציור עמודות עם צבע מעבר והצללה
+    svg.append("g")
+        .selectAll("rect")
+        .data(categories)
+        .enter()
+        .append("rect")
+        .attr("x", d => x(d) + 50)
+        .attr("y", d => y(categoryCounts.get(d)))
+        .attr("width", x.bandwidth())
+        .attr("height", d => 300 - y(categoryCounts.get(d)))
+        .attr("fill", "url(#gradientCategory)")
+        .attr("rx", 5); // קצוות מעוגלים
+
+    // הגדרת מעבר צבע לעמודות
+    svg.append("defs")
+        .append("linearGradient")
+        .attr("id", "gradientCategory")
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "0%")
+        .attr("y2", "100%")
+        .selectAll("stop")
+        .data([
+            { offset: "0%", color: "#ab47bc" },
+            { offset: "100%", color: "#e1bee7" }
+        ])
+        .enter().append("stop")
+        .attr("offset", d => d.offset)
+        .attr("stop-color", d => d.color);
+
+    // הוספת ערכים מספריים מעל כל עמודה
+    svg.selectAll("text.value")
+        .data(categories)
+        .enter()
+        .append("text")
+        .attr("class", "value")
+        .attr("x", d => x(d) + x.bandwidth() / 2 + 50)
+        .attr("y", d => y(categoryCounts.get(d)) - 10)
+        .attr("text-anchor", "middle")
+        .style("fill", "#333")
+        .style("font-weight", "bold")
+        .text(d => categoryCounts.get(d));
+
+    // הוספת שמות הקטגוריות מתחת לעמודות
+    svg.append("g")
+        .attr("transform", "translate(50,300)")
+        .call(d3.axisBottom(x));
+}
+
+// פונקציה לטעינת הנתונים ויצירת הגרפים
+async function loadCharts() {
+    try {
+        const response = await fetch('/api/shoes');
+        if (!response.ok) throw new Error('Failed to load shoe data');
+        const shoes = await response.json();
+        
+        createBrandChart(shoes);
+        createCategoryChart(shoes);
+    } catch (error) {
+        console.error('Error loading charts:', error);
     }
 }
