@@ -45,20 +45,42 @@ connectToDB().then(() => {
     }
   });
 
-  app.get('/api/orders/:userId', async (req, res) => {
-    try {
+// עדכון הנתיב בserver.js
+app.get('/api/orders/:userId', async (req, res) => {
+  try {
       const { userId } = req.params;
-      const userOrders = await Order.find({ userId });
-      if (!userOrders.length) {
-        return res.status(404).json({ message: 'No orders found for this user' });
+      console.log('Received userId:', userId); // לדיבוג
+
+      // בדיקה שה-userId קיים
+      if (!userId) {
+          return res.status(400).json({ message: 'User ID is required' });
       }
-      res.json(userOrders);
-    } catch (err) {
-      console.error('Error fetching user orders:', err);
-      res.status(500).send('Server Error');
-    }
-  });
-  
+
+      // מציאת ההזמנות שמתאימות ל-userId
+      const userOrders = await Order.find()
+          .populate({
+              path: 'shoes.shoeId',
+              model: 'Shoe',
+              select: 'name price images'
+          })
+          .sort({ orderDate: -1 });
+
+      // פילטור ההזמנות לפי userId
+      const filteredOrders = userOrders.filter(order => 
+          order.userId.toString() === userId
+      );
+
+      console.log('Found orders:', filteredOrders); // לדיבוג
+      res.json(filteredOrders);
+      
+  } catch (err) {
+      console.error('Error in /api/orders/:userId:', err);
+      res.status(500).json({ 
+          message: 'Server Error',
+          error: err.message 
+      });
+  }
+});
 
   // Route to get orders of a specific user by email - not working
   /*
