@@ -92,11 +92,40 @@ const orderSchema = new mongoose.Schema({
     default: 'pending',
   }
 });
+// Branch Schema
+const branchSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  address: {
+    street: String,
+    city: String,
+    country: String,
+    postalCode: String,
+  },
+  location: {
+    latitude: {
+      type: Number,
+      required: true,
+    },
+    longitude: {
+      type: Number,
+      required: true,
+    },
+  },
+  navigationLink: {
+    type: String,
+    required: true,
+  },
+});
+
 
 // Create models
 const Shoe = mongoose.model('Shoe', shoeSchema);
 const User = mongoose.model('User', userSchema);
 const Order = mongoose.model('Order', orderSchema);
+const Branch = mongoose.model('Branch', branchSchema);
 
 // Connect to MongoDB function
 const connectToDB = async () => {
@@ -113,5 +142,6 @@ module.exports = {
   connectToDB,
   Shoe,
   User,
-  Order
+  Order,
+  Branch
 };
