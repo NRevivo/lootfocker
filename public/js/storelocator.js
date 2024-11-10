@@ -28,14 +28,14 @@ async function loadBranches() {
   }
   
   // Initialize the map and load branches
-  function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
+  // Initialize the map and load branches
+function initMap() {
+  const map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: 32.100690, lng: 34.827005 },
       zoom: 10,
-    });
-  
-    loadBranches();
-  }
-  
-  window.initMap = initMap;
-    //cheak
+  });
+
+  loadBranches(map); // להעביר את אובייקט המפה לפונקציה
+}
+
+window.initMap = initMap;
