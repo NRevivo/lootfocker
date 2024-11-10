@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const registrationForm = document.getElementById('registrationForm');
+    const termsCheckbox = document.getElementById('terms');
+    const termsError = termsCheckbox.closest('.form-group').querySelector('.error-message'); // <--- השורה הזו עודכנה
 
     // ולידציה בזמן אמת לכל השדות החובה
     document.querySelectorAll('input[required]').forEach(input => {
@@ -112,6 +114,13 @@ document.addEventListener('DOMContentLoaded', function () {
             valid = false;
         }
 
+        // **בדיקת תיבת הסימון (תנאי השימוש)**
+         if (!termsCheckbox.checked) { // <--- התחלת בדיקת תיבת הסימון
+            termsError.style.display = 'block';
+            valid = false;
+        } else {
+            termsError.style.display = 'none';
+        }
         return valid; // מחזיר true רק אם כל הנתונים תקינים
     }
 
