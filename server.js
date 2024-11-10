@@ -128,6 +128,8 @@ app.get('/api/orders/:userId', async (req, res) => {
     }
   });
 
+  
+
   // Route to delete a shoe
   app.delete('/api/shoes/:id', async (req, res) => {
     try {
@@ -507,6 +509,21 @@ app.post('/api/orders', async (req, res) => {
       io.emit('orderCreated', order);
   } catch (err) {
       res.status(500).send('Server Error');
+  }
+});
+
+
+// Route to get a specific shoe by ID
+app.get('/api/shoes/:id', async (req, res) => {
+  try {
+      const shoe = await Shoe.findById(req.params.id);
+      if (!shoe) {
+          return res.status(404).json({ message: 'Product not found' });
+      }
+      res.json(shoe);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: 'Server Error' });
   }
 });
 

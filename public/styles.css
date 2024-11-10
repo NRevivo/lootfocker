@@ -259,42 +259,7 @@ nav {
     gap: 2rem;
 }
 
-.product-card {
-    background-color: #fff;
-    padding: 1rem;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
 
-.product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-.product-card img {
-    max-width: 100%;
-    height: auto;
-    transition: opacity 0.3s ease;
-}
-
-.product-card .hover-image {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.product-card:hover .hover-image {
-    opacity: 1;
-}
-
-.product-card h3 {
-    margin: 1rem 0 0.5rem;
-}
 
 .price {
     font-weight: bold;
