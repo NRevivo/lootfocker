@@ -19,9 +19,6 @@ class ProductComponent {
                 <div class="product-info">
                     <h3>${product.name}</h3>
                     <p class="price">$${product.price.toFixed(2)}</p>
-                    ${product.stock > 0 ? 
-                        '<button class="add-to-cart">Add to Cart</button>' : 
-                        '<span class="out-of-stock">Out of Stock</span>'}
                 </div>
             </div>
         `;
