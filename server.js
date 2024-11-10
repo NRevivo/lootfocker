@@ -527,6 +527,157 @@ app.get('/api/shoes/:id', async (req, res) => {
   }
 });
 
+app.post("/api/cart", async (req, res) => {
+  try {
+      const { productId, size, quantity, userId } = req.body;
+
+      // וידוא שכל השדות הנדרשים קיימים
+      if (!productId || !size || !quantity || !userId) {
+          return res.status(400).json({ 
+              success: false, 
+              message: "Missing required fields" 
+          });
+      }
+
+      // בדיקה שהמוצר קיים
+      const product = await Shoe.findById(productId);
+      if (!product) {
+          return res.status(404).json({ 
+              success: false, 
+              message: "Product not found" 
+          });
+      }
+
+      // בדיקה שהמשתמש קיים
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ 
+              success: false, 
+              message: "User not found" 
+          });
+      }
+
+      // בדיקה אם המוצר כבר קיים בעגלה
+      const existingCartItem = user.cart.find(
+          item => item.shoeId.toString() === productId && item.size === size
+      );
+
+      if (existingCartItem) {
+          // עדכון כמות אם המוצר כבר קיים
+          await User.updateOne(
+              { 
+                  _id: userId, 
+                  'cart.shoeId': productId,
+                  'cart.size': size 
+              },
+              { 
+                  $inc: { 'cart.$.quantity': quantity } 
+              }
+          );
+      } else {
+          // הוספת מוצר חדש לעגלה
+          await User.findByIdAndUpdate(
+              userId,
+              { 
+                  $push: { 
+                      cart: { 
+                          shoeId: productId, 
+                          size: size, 
+                          quantity: quantity 
+                      } 
+                  } 
+              }
+          );
+      }
+
+      // שליפת העגלה המעודכנת עם פרטי המוצרים
+      const updatedUser = await User.findById(userId).populate('cart.shoeId');
+      
+      res.json({ 
+          success: true, 
+          cart: updatedUser.cart 
+      });
+
+  } catch (error) {
+      console.error('Error updating cart:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: "Error updating cart",
+          error: error.message 
+      });
+  }
+});
+
+// נוסיף נתיב לקבלת תוכן העגלה
+app.get("/api/cart/:userId", async (req, res) => {
+  try {
+      const { userId } = req.params;
+      
+      const user = await User.findById(userId).populate('cart.shoeId');
+      if (!user) {
+          return res.status(404).json({ 
+              success: false, 
+              message: "User not found" 
+          });
+      }
+
+      res.json({ 
+          success: true, 
+          cart: user.cart 
+      });
+
+  } catch (error) {
+      console.error('Error fetching cart:', error);
+      res.status(500).json({ 
+          success: false, 
+          message: "Error fetching cart",
+          error: error.message 
+      });
+  }
+});
+
+app.delete('/api/cart/:userId/:itemId', async (req, res) => {
+  try {
+      const { userId, itemId } = req.params;
+      
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found"
+          });
+      }
+
+      // מוצאים את האינדקס של הפריט בעגלה
+      const itemIndex = user.cart.findIndex(item => item._id.toString() === itemId);
+      
+      if (itemIndex === -1) {
+          return res.status(404).json({
+              success: false,
+              message: "Item not found in cart"
+          });
+      }
+
+      // מסירים את הפריט מהעגלה
+      user.cart.splice(itemIndex, 1);
+      await user.save();
+
+      // מחזירים את העגלה המעודכנת עם כל פרטי המוצרים
+      const updatedUser = await User.findById(userId).populate('cart.shoeId');
+      
+      res.json({
+          success: true,
+          cart: updatedUser.cart
+      });
+
+  } catch (error) {
+      console.error('Error removing item from cart:', error);
+      res.status(500).json({
+          success: false,
+          message: "Error removing item from cart"
+      });
+  }
+});
 
   // Start the server
   server.listen(port, () => {

@@ -410,14 +410,27 @@ class ProductComponent {
     static initializeModalEvents() {
         const modal = document.getElementById('productModal');
         const closeBtn = modal.querySelector('.close');
-
-        closeBtn.addEventListener('click', () => {
+    
+        // פונקציה לניקוי כל האירועים והחזרת המודל למצב התחלתי
+        const resetModal = () => {
             modal.classList.remove('active');
-        });
-
+            
+            // איפוס כפתורי הכמות
+            const quantityControls = modal.querySelector('.quantity-controls');
+            const newControls = quantityControls.cloneNode(true);
+            quantityControls.parentNode.replaceChild(newControls, quantityControls);
+            
+            // איפוס כפתור ההוספה לעגלה
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+            const newAddToCartBtn = addToCartBtn.cloneNode(true);
+            addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
+        };
+    
+        closeBtn.addEventListener('click', resetModal);
+    
         window.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.classList.remove('active');
+                resetModal();
             }
         });
     }
@@ -489,94 +502,115 @@ class ProductComponent {
     static initializeModalInteractions(product) {
         const modal = document.getElementById('productModal');
     
-        // בחירת מידה - נשאר ללא שינוי
-        modal.querySelectorAll('.size-options button').forEach(btn => {
+        // Size selection
+        const sizeOptions = modal.querySelector('.size-options');
+        const newSizeOptions = sizeOptions.cloneNode(true);
+        sizeOptions.parentNode.replaceChild(newSizeOptions, sizeOptions);
+    
+        newSizeOptions.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {
-                modal.querySelectorAll('.size-options button').forEach(b => b.classList.remove('selected'));
+                newSizeOptions.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
             });
         });
     
-        // עדכון בקרת הכמות
-        const quantityInput = modal.querySelector('.quantity-input');
-        const decreaseBtn = modal.querySelector('.decrease');
-        const increaseBtn = modal.querySelector('.increase');
+        // Quantity controls
+        const quantityControls = modal.querySelector('.quantity-controls');
+        const newQuantityControls = quantityControls.cloneNode(true);
+        quantityControls.parentNode.replaceChild(newQuantityControls, quantityControls);
     
-        // הגדרת מינימום ומקסימום לשדה הכמות
-        quantityInput.setAttribute('max', product.stock);
-        quantityInput.setAttribute('min', '1');
+        const quantityInput = newQuantityControls.querySelector('.quantity-input');
+        const decreaseBtn = newQuantityControls.querySelector('.decrease');
+        const increaseBtn = newQuantityControls.querySelector('.increase');
     
-        // פונקציה לעדכון ערך הכמות
+        // Set min/max
+        quantityInput.min = 1;
+        quantityInput.max = product.stock;
+        quantityInput.value = 1;
+    
         const updateQuantity = (newValue) => {
-            // וידוא שהערך בין 1 למלאי
-            const value = Math.min(Math.max(1, newValue), product.stock);
+            let value = Math.min(Math.max(1, newValue), product.stock);
             quantityInput.value = value;
-            
-            // עדכון מצב הכפתורים
             decreaseBtn.disabled = value <= 1;
             increaseBtn.disabled = value >= product.stock;
         };
     
-        // טיפול בשינוי ערך ידני
-        quantityInput.addEventListener('change', (e) => {
-            const newValue = parseInt(e.target.value) || 1;
+        // Handle direct input
+        quantityInput.addEventListener('input', (e) => {
+            let newValue = parseInt(e.target.value) || 1;
             updateQuantity(newValue);
         });
     
-        // טיפול בהקלדה בשדה
-        quantityInput.addEventListener('keyup', (e) => {
-            const newValue = parseInt(e.target.value) || 1;
-            updateQuantity(newValue);
-        });
-    
-        // כפתור הפחתה
+        // Single event listener for decrease button
         decreaseBtn.addEventListener('click', () => {
             const currentValue = parseInt(quantityInput.value);
-            updateQuantity(currentValue - 1);
+            if (currentValue > 1) {
+                updateQuantity(currentValue - 1);
+            }
         });
     
-        // כפתור הוספה
+        // Single event listener for increase button
         increaseBtn.addEventListener('click', () => {
             const currentValue = parseInt(quantityInput.value);
-            updateQuantity(currentValue + 1);
+            if (currentValue < product.stock) {
+                updateQuantity(currentValue + 1);
+            }
         });
-    
-        // הגדרת ערך התחלתי
-        updateQuantity(1);
-    
-        // הוספת סגנונות לכפתורים מושבתים
-        const styles = `
-            .quantity-btn:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-        `;
-        const styleSheet = document.createElement('style');
-        styleSheet.textContent = styles;
-        document.head.appendChild(styleSheet);
-    
-        const addToCartBtn = modal.querySelector('.add-to-cart-btn');
-        addToCartBtn.addEventListener('click', () => {
-            const selectedSize = modal.querySelector('.size-options button.selected')?.dataset.size;
-            const quantity = parseInt(quantityInput.value);
-    
-            if (!selectedSize) {
-                alert('Please select size');
-                return;
-            }
-    
-            if (quantity < 1 || quantity > product.stock) {
-                alert('Invalid quantity');
-                return;
-            }
-    
-            console.log('Adding to cart:', {
-                productId: product._id,
-                size: selectedSize,
-                quantity: quantity
+        // Add to cart button
+    const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+    const newAddToCartBtn = addToCartBtn.cloneNode(true);
+    addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
+
+    newAddToCartBtn.addEventListener('click', async () => {
+        const selectedSize = newSizeOptions.querySelector('button.selected')?.dataset.size;
+        const quantity = parseInt(quantityInput.value);
+        const userId = sessionStorage.getItem('userId');
+
+        if (!userId) {
+            alert('Please log in to add items to cart');
+            return;
+        }
+
+        if (!selectedSize) {
+            alert('Please select size');
+            return;
+        }
+
+        if (quantity < 1 || quantity > product.stock) {
+            alert('Invalid quantity');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: product._id,
+                    size: selectedSize,
+                    quantity: quantity,
+                    userId: userId
+                }),
             });
-        });
-    }
+
+            const data = await response.json();
+            if (data.success) {
+                window.CartUtilities.updateCartDisplay(data.cart);
+                modal.classList.remove('active');
+                alert('Product added to cart successfully!');
+            } else {
+                alert(data.message || 'Error adding to cart');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error adding to cart');
+        }
+    });
+}
+    
+
     static changeMainImage(thumbnailImg) {
         const modal = document.getElementById('productModal');
         const mainImage = modal.querySelector('.main-image');
