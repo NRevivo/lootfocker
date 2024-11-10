@@ -56,7 +56,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'user'],
     default: 'user',
-  }
+  },
+  cart: [
+    {
+      shoeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Shoe', required: true },
+      size: { type: String, required: true },
+      quantity: { type: Number, required: true }
+    }
+  ]
 });
 
 // Order Schema

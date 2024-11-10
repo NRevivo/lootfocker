@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-     <script src="js/register.js"></script>
+    <script src="js/register.js"></script>
 </head>
 <body>
     <!-- לשונית עליונה -->
@@ -15,33 +15,35 @@
     <div id="header-container"></div>
     <!-- לשונית עליונה -->
 
+
     <div role="main">
         <main class="registration-page">
             <div class="registration-container">
                 <h1>Create Account</h1>
-                <form id="registrationForm" class="registration-form">
+                <form id="registrationForm" class="registration-form" novalidate>
                     <!-- Personal Information -->
                     <div class="form-section">
                         <h2>Personal Information</h2>
                         <div class="form-group">
                             <label for="firstName">First Name *</label>
                             <input type="text" id="firstName" name="firstName" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter your first name.</small>
                         </div>
                         <div class="form-group">
                             <label for="lastName">Last Name *</label>
                             <input type="text" id="lastName" name="lastName" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter your last name.</small>
                         </div>
                         <div class="form-group">
                             <label for="email">Email *</label>
                             <input type="email" id="email" name="email" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter a valid email address.</small>
                         </div>
                         <div class="form-group">
                             <label for="password">Password *</label>
-                            <input type="password" id="password" name="password" required>
-                            <small class="password-requirements">
-                            </small>
+                            <input type="password" id="password" name="password" required minlength="6">
+                            <small class="error-message" style="display: none; color: red;">Password must be at least 6 characters.</small>
                         </div>
-                        
                     </div>
 
                     <!-- Address -->
@@ -50,10 +52,12 @@
                         <div class="form-group">
                             <label for="street">Street Address *</label>
                             <input type="text" id="street" name="street" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter your street address.</small>
                         </div>
                         <div class="form-group">
                             <label for="city">City *</label>
                             <input type="text" id="city" name="city" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter your city.</small>
                         </div>
                         <div class="form-group">
                             <label for="postalCode">Postal Code</label>
@@ -62,6 +66,7 @@
                         <div class="form-group">
                             <label for="phone">Phone Number *</label>
                             <input type="tel" id="phone" name="phone" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter a valid phone number.</small>
                         </div>
                     </div>
 
@@ -71,30 +76,36 @@
                         <div class="form-group">
                             <label for="cardNumber">Card Number *</label>
                             <input type="text" id="cardNumber" name="cardNumber" maxlength="16" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter a valid card number.</small>
                         </div>
                         <div class="form-row">
                             <div class="form-group half">
                                 <label for="expirationDate">Expiration Date *</label>
                                 <input type="text" id="expirationDate" name="expirationDate" placeholder="MM/YY" required>
+                                <small class="error-message" style="display: none; color: red;">Please enter a valid expiration date.</small>
                             </div>
                             <div class="form-group half">
                                 <label for="cvv">CVV *</label>
                                 <input type="text" id="cvv" name="cvv" maxlength="4" required>
+                                <small class="error-message" style="display: none; color: red;">Please enter a valid CVV.</small>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="cardHolderName">Cardholder Name *</label>
                             <input type="text" id="cardHolderName" name="cardHolderName" required>
+                            <small class="error-message" style="display: none; color: red;">Please enter the cardholder's name.</small>
                         </div>
                     </div>
 
                     <!-- Terms and Conditions -->
                     <div class="form-section">
                         <div class="form-group checkbox">
-                            <input type="checkbox" id="terms" name="terms" required>
-                            <label for="terms">I agree to the Terms of Service and Privacy Policy *</label>
+                            <label for="terms">
+                                <input type="checkbox" id="terms" name="terms" required>
+                                I agree to the Terms of Service and Privacy Policy *
+                            </label>
+                            <small class="error-message" style="display: none; color: red;">You must agree to the terms.</small>
                         </div>
-                        
                     </div>
 
                     <div class="form-note">

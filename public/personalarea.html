@@ -35,21 +35,6 @@
 	<!-- לשונית תחתונה -->
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const userId = sessionStorage.getItem('userId'); // נניח שה-id נשמר ב-session לאחר הכניסה
-            if (userId) {
-                try {
-                    await fetchUserOrders(userId);
-                    document.getElementById('loading-message').style.display = 'none';
-                } catch (error) {
-                    document.getElementById('loading-message').style.display = 'none';
-                    document.getElementById('error-message').style.display = 'block';
-                }
-            } else {
-                document.getElementById('orders-list').innerHTML = '<p>אנא התחבר כדי לראות את ההזמנות שלך.</p>';
-            }
-        });
-    </script>
+ 
 </body>
 </html>

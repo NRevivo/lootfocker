@@ -1,24 +1,52 @@
- // Fetch orders for the logged-in user based on userId
-    async function fetchUserOrders(userId) {
+document.addEventListener('DOMContentLoaded', function() {
+    const loadingMessage = document.getElementById('loading-message');
+    const errorMessage = document.getElementById('error-message');
+    const ordersList = document.getElementById('orders-list');
+
+    async function loadOrders() {
+        // מסתיר את שתי ההודעות בהתחלה
+        errorMessage.style.display = 'none';
+        loadingMessage.style.display = 'block';
+        
         try {
+            const rawUserId = sessionStorage.getItem('userId');
+            console.log('Raw userId from session:', rawUserId);
+
+            if (!rawUserId) {
+                ordersList.innerHTML = '<p>אנא התחבר כדי לצפות בהזמנות שלך</p>';
+                loadingMessage.style.display = 'none';
+                return;
+            }
+
+            const userId = rawUserId.replace(/^"|"$/g, '');
             const response = await fetch(`/api/orders/${userId}`);
-            if (!response.ok) throw new Error('Error fetching orders');
-            
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
             const orders = await response.json();
-            displayUserOrders(orders); // פונקציה שמציגה את ההזמנות למשתמש
+            
+            // מציג את ההזמנות ומסתיר את הודעת השגיאה
+            displayOrders(orders);
+            errorMessage.style.display = 'none';
+
         } catch (error) {
-            console.error(error);
-            document.getElementById('error-message').style.display = 'block';
+            console.error('Error loading orders:', error);
+            // מציג את הודעת השגיאה רק במקרה של שגיאה
+            errorMessage.style.display = 'block';
+            ordersList.innerHTML = ''; // מנקה את רשימת ההזמנות במקרה של שגיאה
+        } finally {
+            // מסתיר את הודעת הטעינה בכל מקרה
+            loadingMessage.style.display = 'none';
         }
     }
 
-    // Display orders function
-    function displayUserOrders(orders) {
-        const ordersList = document.getElementById('orders-list');
-        ordersList.innerHTML = ''; // Clear previous content
+    function displayOrders(orders) {
+        ordersList.innerHTML = '';
 
-        if (orders.length === 0) {
-            ordersList.innerHTML = '<p>אין הזמנות זמינות.</p>';
+        if (!orders || orders.length === 0) {
+            ordersList.innerHTML = '<p class="no-orders">אין הזמנות זמינות</p>';
             return;
         }
 
@@ -26,21 +54,51 @@
             const orderDiv = document.createElement('div');
             orderDiv.classList.add('order-card');
 
-            const orderDate = new Date(order.orderDate).toLocaleDateString();
-            const orderImages = order.shoes.map(shoe => 
-                `<img src="${shoe.shoeId.images[0] || '/images/no-image.jpg'}" class="order-image" alt="Product Image">`
-            ).join('');
+            // יצירת מספר הזמנה קצר מה-ID המלא
+            const shortOrderId = order._id.slice(-6).toUpperCase();
+            
+            const orderDate = order.orderDate ? 
+                new Date(order.orderDate).toLocaleDateString('he-IL') : 
+                'תאריך לא זמין';
+
+            let shoesContent = '';
+            if (order.shoes && Array.isArray(order.shoes)) {
+                shoesContent = order.shoes.map(shoe => {
+                    const shoeData = shoe.shoeId || {};
+                    return `
+                        <div class="shoe-item">
+                            <img src="${shoeData.images?.[0] || '/images/no-image.jpg'}" 
+                                 class="order-image" 
+                                 alt="תמונת מוצר">
+                            <div class="shoe-details">
+                                <p class="shoe-name">${shoeData.name || 'שם לא זמין'}</p>
+                                <p class="shoe-quantity">כמות: ${shoe.quantity || 0}</p>
+                                <p class="shoe-price">מחיר: ₪${shoeData.price?.toFixed(2) || '0.00'}</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
 
             orderDiv.innerHTML = `
                 <div class="order-header">
-                    <h2>הזמנה #${order._id}</h2>
-                    <span class="status">${order.status}</span>
+                    <div class="order-title">
+                        <div class="order-id"> ${shortOrderId} הזמנה מס׳</div>
+                        <span class="order-date">${orderDate}</span>
+                        <span class="status ${order.status}">${getStatusText(order.status)}</span>
+                    </div>
+                    <p class="order-summary">סה"כ הזמנה: ₪${order.totalAmount?.toFixed(2) || '0.00'}</p>
                 </div>
                 <div class="order-content">
-                    <p class="order-info">תאריך: ${orderDate}</p>
-                    <p class="order-summary">סה"כ הזמנה: ₪${order.totalAmount.toFixed(2)}</p>
-                    <div class="order-details">
-                        ${orderImages}
+                    <div class="order-main">
+                        <div class="products-section">
+                            ${shoesContent}
+                        </div>
+                        <div class="shipping-info">
+                            <h3>כתובת למשלוח:</h3>
+                            <p>${order.shippingAddress?.street || ''}</p>
+                            <p>${order.shippingAddress?.city || ''}</p>
+                        </div>
                     </div>
                 </div>
             `;
@@ -49,15 +107,16 @@
         });
     }
 
-    // Check for userId and fetch orders if available
-    const userId = sessionStorage.getItem('userId'); // נניח שה-id נשמר ב-session לאחר הכניסה
-    if (userId) {
-        document.getElementById('loading-message').style.display = 'block';
-        fetchUserOrders(userId).then(() => {
-            document.getElementById('loading-message').style.display = 'none';
-        });
-    } else {
-        console.error("User ID not found. Please login again.");
-        document.getElementById('orders-list').innerHTML = '<p>אנא התחבר כדי לראות את ההזמנות שלך.</p>';
+    function getStatusText(status) {
+        const statusMap = {
+            'pending': 'ממתין לאישור',
+            'shipped': 'נשלח',
+            'delivered': 'נמסר',
+            'cancelled': 'בוטל'
+        };
+        return statusMap[status] || status;
     }
 
+    // התחלת טעינת ההזמנות
+    loadOrders();
+});

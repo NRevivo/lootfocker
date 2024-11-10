@@ -7,7 +7,6 @@ class ProductComponent {
         }
     }
 
-    // יצירת כרטיס מוצר בסיסי שמוצג בדף
     static createProductCard(product) {
         return `
             <div class="product-card" data-product-id="${product._id}">
@@ -20,15 +19,11 @@ class ProductComponent {
                 <div class="product-info">
                     <h3>${product.name}</h3>
                     <p class="price">$${product.price.toFixed(2)}</p>
-                    ${product.stock > 0 ? 
-                        '<button class="add-to-cart">Add to Cart</button>' : 
-                        '<span class="out-of-stock">Out of Stock</span>'}
                 </div>
             </div>
         `;
     }
 
-    // HTML של המודל (החלון הקופץ)
     static getModalHTML() {
         return `
             <div id="productModal" class="modal">
@@ -36,44 +31,45 @@ class ProductComponent {
                     <button class="close" aria-label="Close">×</button>
                     
                     <div class="modal-body">
-                        <!-- תמונות המוצר -->
-                        <div class="product-images">
-                            <img src="" alt="" class="main-image">
-                            <div class="thumbnail-images"></div>
+                        <!-- חלק עליון - תמונות -->
+                        <div class="modal-top">
+                            <div class="product-images-section">
+                                <div class="main-image-container">
+                                    <img src="" alt="" class="main-image">
+                                </div>
+                                <div class="thumbnail-images"></div>
+                            </div>
                         </div>
 
-                        <!-- פרטי המוצר -->
-                        <div class="product-details">
-                            <h2 class="product-title"></h2>
-                            <p class="product-price"></p>
-                            
-                            <div class="product-description">
-                                <p></p>
-                            </div>
-
-                            <!-- בחירת מידה -->
-                            <div class="size-selection">
-                                <h3>Size</h3>
-                                <div class="size-options"></div>
-                            </div>
-
-                            <!-- בחירת צבע -->
-                            <div class="color-selection">
-                                <h3>Color</h3>
-                                <div class="color-options"></div>
-                            </div>
-
-                            <!-- בחירת כמות -->
-                            <div class="quantity-selection">
-                                <h3>Quantity</h3>
-                                <div class="quantity-controls">
-                                    <button class="decrease">-</button>
-                                    <input type="number" value="1" min="1">
-                                    <button class="increase">+</button>
+                        <!-- חלק תחתון -->
+                        <div class="modal-bottom">
+                            <!-- צד ימין - פרטי מוצר -->
+                            <div class="product-info-section">
+                                <h2 class="product-title"></h2>
+                                <p class="product-price"></p>
+                                <div class="product-description">
+                                    <p></p>
                                 </div>
                             </div>
 
-                            <button class="add-to-cart-btn">Add to Cart</button>
+                            <!-- צד שמאל - בחירות -->
+                            <div class="product-selections">
+                                <div class="size-selection">
+                                    <h3>Size</h3>
+                                    <div class="size-options"></div>
+                                </div>
+
+                                <div class="quantity-selection">
+                                    <h3>Quantity</h3>
+                                    <div class="quantity-controls">
+                                        <button class="quantity-btn decrease">-</button>
+                                        <input type="number" value="1" min="1" class="quantity-input">
+                                        <button class="quantity-btn increase">+</button>
+                                    </div>
+                                </div>
+
+                                <button class="add-to-cart-btn">Add to Cart</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -81,179 +77,326 @@ class ProductComponent {
         `;
     }
 
-    // סגנונות המודל
     static addModalStyles() {
         const styles = `
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 1000;
-                justify-content: center;
-                align-items: center;
-            }
+        /* סגנונות כרטיס המוצר - נשארים זהים */
+        .product-card {
+            background-color: #fff;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
 
-            .modal.active {
-                display: flex;
-            }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
-            .modal-content {
-                background: white;
-                width: 90%;
-                max-width: 1000px;
-                max-height: 90vh;
-                overflow-y: auto;
-                border-radius: 8px;
-                position: relative;
-            }
+        .product-image-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
 
-            .close {
-                position: absolute;
-                right: 20px;
-                top: 20px;
-                font-size: 24px;
-                cursor: pointer;
-                border: none;
-                background: none;
-                z-index: 1;
-            }
+        .product-image-container .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
 
-            .modal-body {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 30px;
-                padding: 30px;
-            }
+        .product-image-container .hover-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-            /* סגנונות לתמונות */
-            .product-images {
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-            }
+        .product-card:hover .hover-image {
+            opacity: 1;
+        }
 
-            .main-image {
-                width: 100%;
-                height: auto;
-                border-radius: 8px;
-            }
+        .product-card:hover .main-image {
+            opacity: 0;
+        }
 
-            .thumbnail-images {
-                display: flex;
-                gap: 10px;
-                flex-wrap: wrap;
-            }
+        .product-info {
+            position: relative;
+            z-index: 2;
+            background: white;
+            padding-top: 10px;
+        }
 
-            .thumbnail-images img {
-                width: 60px;
-                height: 60px;
-                border-radius: 4px;
-                cursor: pointer;
-                border: 2px solid transparent;
-            }
+        .product-info h3 {
+            margin: 1rem 0 0.5rem;
+        }
 
-            .thumbnail-images img.active {
-                border-color: black;
-            }
+        .product-info .price {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
 
-            /* סגנונות לפרטי המוצר */
-            .product-details {
-                display: flex;
-                flex-direction: column;
-                gap: 20px;
-            }
+        /* סגנונות המודל החדש */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
-            .product-title {
-                font-size: 24px;
-                margin: 0;
-            }
+        .modal.active {
+            display: flex;
+        }
 
-            .product-price {
-                font-size: 20px;
-                font-weight: bold;
-            }
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 12px;
+            position: relative;
+            padding: 20px;
+        }
 
-            /* סגנונות למידות */
-            .size-options {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-            }
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            max-height: 90vh;
+        }
 
-            .size-options button {
-                width: 50px;
-                height: 40px;
-                border: 1px solid #ddd;
-                background: white;
-                cursor: pointer;
-                border-radius: 4px;
-            }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            z-index: 1;
+            transition: transform 0.2s;
+        }
 
-            .size-options button.selected {
-                background: black;
-                color: white;
-            }
+        .close:hover {
+            transform: scale(1.1);
+        }
 
-            /* סגנונות לצבעים */
-            .color-options {
-                display: flex;
-                gap: 10px;
-            }
+        .modal-top {
+            flex: 1;
+            min-height: 45vh;
+            display: flex;
+            justify-content: center;
+        }
 
-            .color-option {
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                cursor: pointer;
-                border: 2px solid transparent;
-            }
+        .product-images-section {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
 
-            .color-option.selected {
-                border-color: black;
-            }
+        .main-image-container {
+            width: 100%;
+            max-width: 400px;  /* הקטנת הגודל המקסימלי */
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0 auto 15px;
+        }
 
-            /* סגנונות לבחירת כמות */
-            .quantity-controls {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
+        .main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
 
-            .quantity-controls button {
-                width: 30px;
-                height: 30px;
-                border: 1px solid #ddd;
-                background: white;
-                cursor: pointer;
-            }
+        /* עדכון סגנונות לתמונות הממוזערות */
+        .thumbnail-images {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;  /* מרווח מהתוכן שמתחת */
+            padding: 0 10px;      /* מרווח מהצדדים */
+        }
 
-            .quantity-controls input {
-                width: 50px;
+        .thumbnail-images img {
+            width: 60px;          /* הקטנת גודל התמונות הממוזערות */
+            height: 60px;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .thumbnail-images img:hover {
+            border-color: #666;
+        }
+
+        .thumbnail-images img.active {
+            border-color: #000;
+        }
+
+        .modal-bottom {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .product-info-section {
+            padding-right: 20px;
+        }
+
+        .product-title {
+            font-size: 28px;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+
+        .product-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .product-selections {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .size-selection {
+            text-align: center;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .size-options button {
+            min-width: 50px;
+            height: 50px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .size-options button:hover {
+            border-color: #000;
+        }
+
+        .size-options button.selected {
+            background: #000;
+            color: white;
+            border-color: #000;
+        }
+
+        .quantity-selection {
+            text-align: center;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 200px;
+            margin: 10px auto 0;
+            justify-content: center;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.2s;
+        }
+
+        .quantity-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .quantity-input {
+            width: 60px;
+            height: 40px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .quantity-input::-webkit-inner-spin-button,
+        .quantity-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .quantity-input {
+            -moz-appearance: textfield;
+        }
+
+        .add-to-cart-btn {
+            width: fit-content;
+            min-width: 200px;
+            padding: 15px 30px;
+            margin: 20px auto 0;
+            display: block;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            background: #333;
+        }
+
+        @media (max-width: 768px) {
+            .modal-bottom {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-info-section {
+                padding-right: 0;
                 text-align: center;
-                border: 1px solid #ddd;
-                padding: 5px;
             }
-
-            .add-to-cart-btn {
-                width: 100%;
-                padding: 15px;
-                background: black;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-                margin-top: 20px;
-            }
-
-            @media (max-width: 768px) {
-                .modal-body {
-                    grid-template-columns: 1fr;
-                }
-            }
+        }
         `;
 
         const styleSheet = document.createElement("style");
@@ -261,30 +404,39 @@ class ProductComponent {
         document.head.appendChild(styleSheet);
     }
 
-    // אתחול אירועי המודל
     static initializeModalEvents() {
         const modal = document.getElementById('productModal');
         const closeBtn = modal.querySelector('.close');
-
-        // סגירת המודל
-        closeBtn.addEventListener('click', () => {
+    
+        // פונקציה לניקוי כל האירועים והחזרת המודל למצב התחלתי
+        const resetModal = () => {
             modal.classList.remove('active');
-        });
-
-        // סגירה בלחיצה מחוץ למודל
+            
+            // איפוס כפתורי הכמות
+            const quantityControls = modal.querySelector('.quantity-controls');
+            const newControls = quantityControls.cloneNode(true);
+            quantityControls.parentNode.replaceChild(newControls, quantityControls);
+            
+            // איפוס כפתור ההוספה לעגלה
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+            const newAddToCartBtn = addToCartBtn.cloneNode(true);
+            addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
+        };
+    
+        closeBtn.addEventListener('click', resetModal);
+    
         window.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.classList.remove('active');
+                resetModal();
             }
         });
     }
 
-    // אתחול כרטיסי המוצרים
     static initializeProductCards() {
         const productCards = document.querySelectorAll('.product-card');
         productCards.forEach(card => {
             card.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('add-to-cart-btn')) {
+                if (!e.target.classList.contains('add-to-cart')) {
                     const productId = card.dataset.productId;
                     this.openProductModal(productId);
                 }
@@ -292,121 +444,170 @@ class ProductComponent {
         });
     }
 
-    // פתיחת המודל עם נתוני המוצר
     static async openProductModal(productId) {
         try {
             const response = await fetch(`/api/shoes/${productId}`);
             const product = await response.json();
             const modal = document.getElementById('productModal');
-
-            // עדכון תוכן המודל
+    
             modal.querySelector('.product-title').textContent = product.name;
             modal.querySelector('.product-price').textContent = `₪${product.price.toFixed(2)}`;
             modal.querySelector('.product-description p').textContent = product.description;
-
-            // עדכון תמונות
+    
             const mainImage = modal.querySelector('.main-image');
             mainImage.src = product.images[0];
             mainImage.alt = product.name;
-
-            // תמונות ממוזערות
+    
+            // עדכון התמונות הממוזערות בלי onclick במחרוזת
             const thumbnailsContainer = modal.querySelector('.thumbnail-images');
             thumbnailsContainer.innerHTML = product.images
                 .map((img, index) => `
                     <img src="${img}" 
                          alt="${product.name}" 
                          class="${index === 0 ? 'active' : ''}"
-                         onclick="ProductComponent.changeMainImage(this)">
+                         data-index="${index}">
                 `).join('');
-
-            // עדכון מידות
+    
+            // הוספת event listeners לתמונות הממוזערות
+            thumbnailsContainer.querySelectorAll('img').forEach(img => {
+                img.addEventListener('click', () => {
+                    const mainImage = modal.querySelector('.main-image');
+                    mainImage.src = img.src;
+                    
+                    // הסרת active מכל התמונות והוספה לתמונה הנוכחית
+                    thumbnailsContainer.querySelectorAll('img').forEach(thumb => {
+                        thumb.classList.remove('active');
+                    });
+                    img.classList.add('active');
+                });
+            });
+    
             const sizesContainer = modal.querySelector('.size-options');
             sizesContainer.innerHTML = product.sizes
                 .map(size => `
                     <button data-size="${size}">${size}</button>
                 `).join('');
-
-            // עדכון צבעים
-            const colorsContainer = modal.querySelector('.color-options');
-            colorsContainer.innerHTML = product.colors
-                .map(color => `
-                    <div class="color-option" 
-                         style="background-color: ${color}"
-                         data-color="${color}">
-                    </div>
-                `).join('');
-
-            // הצגת המודל
+    
             modal.classList.add('active');
             this.initializeModalInteractions(product);
-
+    
         } catch (error) {
             console.error('Error loading product:', error);
         }
     }
 
-    // אתחול האינטראקציות במודל
     static initializeModalInteractions(product) {
         const modal = document.getElementById('productModal');
-
-        // בחירת מידה
-        modal.querySelectorAll('.size-options button').forEach(btn => {
+    
+        // Size selection
+        const sizeOptions = modal.querySelector('.size-options');
+        const newSizeOptions = sizeOptions.cloneNode(true);
+        sizeOptions.parentNode.replaceChild(newSizeOptions, sizeOptions);
+    
+        newSizeOptions.querySelectorAll('button').forEach(btn => {
             btn.addEventListener('click', () => {
-                modal.querySelectorAll('.size-options button').forEach(b => b.classList.remove('selected'));
+                newSizeOptions.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
                 btn.classList.add('selected');
             });
         });
-
-        // בחירת צבע
-        modal.querySelectorAll('.color-option').forEach(color => {
-            color.addEventListener('click', () => {
-                modal.querySelectorAll('.color-option').forEach(c => c.classList.remove('selected'));
-                color.classList.add('selected');
-            });
+    
+        // Quantity controls
+        const quantityControls = modal.querySelector('.quantity-controls');
+        const newQuantityControls = quantityControls.cloneNode(true);
+        quantityControls.parentNode.replaceChild(newQuantityControls, quantityControls);
+    
+        const quantityInput = newQuantityControls.querySelector('.quantity-input');
+        const decreaseBtn = newQuantityControls.querySelector('.decrease');
+        const increaseBtn = newQuantityControls.querySelector('.increase');
+    
+        // Set min/max
+        quantityInput.min = 1;
+        quantityInput.max = product.stock;
+        quantityInput.value = 1;
+    
+        const updateQuantity = (newValue) => {
+            let value = Math.min(Math.max(1, newValue), product.stock);
+            quantityInput.value = value;
+            decreaseBtn.disabled = value <= 1;
+            increaseBtn.disabled = value >= product.stock;
+        };
+    
+        // Handle direct input
+        quantityInput.addEventListener('input', (e) => {
+            let newValue = parseInt(e.target.value) || 1;
+            updateQuantity(newValue);
         });
-
-        // כפתורי כמות
-        const quantityInput = modal.querySelector('.quantity-controls input');
-        const decreaseBtn = modal.querySelector('.decrease');
-        const increaseBtn = modal.querySelector('.increase');
-
+    
+        // Single event listener for decrease button
         decreaseBtn.addEventListener('click', () => {
             const currentValue = parseInt(quantityInput.value);
             if (currentValue > 1) {
-                quantityInput.value = currentValue - 1;
+                updateQuantity(currentValue - 1);
             }
         });
-
+    
+        // Single event listener for increase button
         increaseBtn.addEventListener('click', () => {
             const currentValue = parseInt(quantityInput.value);
             if (currentValue < product.stock) {
-                quantityInput.value = currentValue + 1;
+                updateQuantity(currentValue + 1);
             }
         });
+        // Add to cart button
+    const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+    const newAddToCartBtn = addToCartBtn.cloneNode(true);
+    addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
 
-        // הוספה לסל
-        const addToCartBtn = modal.querySelector('.add-to-cart-btn');
-        addToCartBtn.addEventListener('click', () => {
-            const selectedSize = modal.querySelector('.size-options button.selected')?.dataset.size;
-            const selectedColor = modal.querySelector('.color-option.selected')?.dataset.color;
-            const quantity = parseInt(quantityInput.value);
+    newAddToCartBtn.addEventListener('click', async () => {
+        const selectedSize = newSizeOptions.querySelector('button.selected')?.dataset.size;
+        const quantity = parseInt(quantityInput.value);
+        const userId = sessionStorage.getItem('userId');
 
-            if (!selectedSize || !selectedColor) {
-                alert('Please select size and color');
-                return;
-            }
+        if (!userId) {
+            alert('Please log in to add items to cart');
+            return;
+        }
 
-            // כאן תוסיף את הלוגיקה של הוספה לסל
-            console.log('Adding to cart:', {
-                productId: product._id,
-                size: selectedSize,
-                color: selectedColor,
-                quantity: quantity
+        if (!selectedSize) {
+            alert('Please select size');
+            return;
+        }
+
+        if (quantity < 1 || quantity > product.stock) {
+            alert('Invalid quantity');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    productId: product._id,
+                    size: selectedSize,
+                    quantity: quantity,
+                    userId: userId
+                }),
             });
-        });
-    }
 
-    // החלפת תמונה ראשית
+            const data = await response.json();
+            if (data.success) {
+                window.CartUtilities.updateCartDisplay(data.cart);
+                modal.classList.remove('active');
+                alert('Product added to cart successfully!');
+            } else {
+                alert(data.message || 'Error adding to cart');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error adding to cart');
+        }
+    });
+}
+    
+
     static changeMainImage(thumbnailImg) {
         const modal = document.getElementById('productModal');
         const mainImage = modal.querySelector('.main-image');
