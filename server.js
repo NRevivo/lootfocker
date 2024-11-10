@@ -82,11 +82,6 @@ app.get('/api/orders/:userId', async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-=======
- 
-
->>>>>>> 8fa1902 (.)
   // Route to create a new shoe
   app.post('/api/shoes', async (req, res) => {
     try {
