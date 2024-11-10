@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
- <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loot Focker</title>
@@ -16,22 +16,20 @@
     <div id="header-container"></div>
     <!-- לשונית עליונה -->
 
-
     <!-- קוד להצגת מפת החנויות -->
     <section class="map-section">
         <h2>Find Our Stores</h2>
-        <iframe 
-            src="https://www.google.com/maps/d/embed?mid=1Auz0dHqHHgeazOwF_SPWd94xVz5yk50&ll=32.10069064564503%2C34.827005490282446&z=16"
-            width="640"
-            height="480"
-            allowfullscreen>
-        </iframe>
+        <div id="map" style="width: 640px; height: 480px;"></div>
     </section>
 
-<!-- לשונית תחתונה -->
-<div id="footer-container"></div>
-<script src="js/footer.js"></script>
-<!-- לשונית תחתונה -->
- 
+    <!-- לשונית תחתונה -->
+    <div id="footer-container"></div>
+    <script src="js/footer.js"></script>
+    <!-- לשונית תחתונה -->
+    
+    <!-- Google Maps JavaScript API -->
+    <script async defer
+       src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+    </script>
 </body>
 </html>

@@ -525,3 +525,15 @@ app.post('/api/orders', async (req, res) => {
   process.exit(1);
 });
 
+// Import the Branch model (assuming it's exported from db.js)
+const { Branch } = require('./config/db');
+
+// API לקבלת כל הסניפים
+app.get('/api/branches', async (req, res) => {
+  try {
+    const branches = await Branch.find();
+    res.json(branches);
+  } catch (err) {
+    res.status(500).send('Server Error');
+  }
+});
