@@ -82,33 +82,6 @@ app.get('/api/orders/:userId', async (req, res) => {
   }
 });
 
-  // Route to get orders of a specific user by email - not working
-  /*
-app.get('/api/orders/:email', async (req, res) => {
-  try {
-      const { email } = req.params;
-      
-      // מצא את המשתמש לפי כתובת האימייל
-      const user = await User.findOne({ email });
-      if (!user) {
-          console.log("User not found with email:", email);
-          return res.status(404).json({ message: 'User not found' });
-      }
-
-      console.log("User found:", user);
-
-      // מצא את ההזמנות לפי userId של המשתמש שנמצא
-      const userOrders = await Order.find({ userId: user._id });
-      console.log("Orders found for user:", userOrders);
-
-      res.json(userOrders);
-  } catch (err) {
-      console.error('Error fetching user orders:', err);
-      res.status(500).send('Server Error');
-  }
-});
-*/
-
   // Route to create a new shoe
   app.post('/api/shoes', async (req, res) => {
     try {
