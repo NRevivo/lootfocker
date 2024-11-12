@@ -13,13 +13,13 @@ window.CartUtilities = {
         }
 
         if (!cart || cart.length === 0) {
+            // אם העגלה ריקה, הצגת הודעה רלוונטית
             cartItems.innerHTML = `
                 <div class="empty-cart">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20.12 6.12L3 6l2.67 10.68a2 2 0 0 0 2 1.32h8.66a2 2 0 0 0 2-1.32L20.12 6.12z"/>
                     </svg>
                     <p>Your cart is empty</p>
-                    
                 </div>
             `;
             if (cartTotal) {
@@ -40,6 +40,7 @@ window.CartUtilities = {
             const itemTotal = shoe.price * item.quantity;
             total += itemTotal;
 
+            // יצירת פריטים לעגלה
             html += `
                 <div class="cart-item" data-item-id="${item._id}">
                     <div class="cart-item-image">
@@ -73,7 +74,7 @@ window.CartUtilities = {
         }
     },
 
-    // פונקציה חדשה להסרת פריט
+    // פונקציה להסרת פריט מהעגלה
     removeItem: async function(itemId) {
         const userId = sessionStorage.getItem('userId');
         if (!userId) return;
@@ -86,13 +87,12 @@ window.CartUtilities = {
             
             if (data.success) {
                 this.updateCartDisplay(data.cart);
-                // הודעה למשתמש
+                // הצגת הודעה על הסרת הפריט
                 const notification = document.createElement('div');
                 notification.className = 'cart-notification';
                 notification.textContent = 'Item removed from cart';
                 document.body.appendChild(notification);
                 
-                // הסרת ההודעה אחרי 2 שניות
                 setTimeout(() => {
                     notification.remove();
                 }, 2000);
@@ -105,6 +105,7 @@ window.CartUtilities = {
         }
     },
 
+    // טעינת העגלה עבור המשתמש
     loadCart: async function() {
         const userId = sessionStorage.getItem('userId');
         if (!userId) {
@@ -126,10 +127,8 @@ window.CartUtilities = {
     }
 };
 
-
-
 document.addEventListener('DOMContentLoaded', async function() {
-    // טוען את ה-Header מ-header.html ומוסיף אותו ל-document
+    // טעינת ה-Header מהקובץ header.html
     async function loadHeader() {
         try {
             const response = await fetch('header.html');
@@ -147,16 +146,17 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // פונקציה לאתחול כל אירועי ה-Header והגדרות הכפתורים
+    // אתחול פונקציות ה-Header
     function initializeHeader() {
         updateAuthButton();
         loadAdminButtonIfNeeded();
         loadPersonalAreaButtonIfNeeded();
         initializeEventListeners();
         updateGreetingMessage();
-        window.CartUtilities.loadCart();    }
+        window.CartUtilities.loadCart();    
+    }
 
-    // עדכון כפתור ההתחברות/יציאה
+    // עדכון טקסט הכפתור התחברות/התנתקות
     function updateAuthButton() {
         const authButton = document.getElementById('authButton');
         if (sessionStorage.getItem('isLoggedIn') === "true") {
@@ -166,23 +166,46 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // טעינת כפתור האדמין אם המשתמש הוא אדמין
+    // הצגת כפתור האדמין אם המשתמש הוא אדמין
     function loadAdminButtonIfNeeded() {
         if (sessionStorage.getItem('isLoggedIn') === "true" && 
             sessionStorage.getItem('isAdmin') === "true") {
             const navLinks = document.querySelector(".nav-links");
             if (!navLinks) return;
-
+    
             if (!document.querySelector(".admin-link")) {
                 const adminItem = document.createElement("li");
                 adminItem.classList.add("menu-item", "admin-link");
-                adminItem.innerHTML = '<a href="admin.html" class="admin-button">Admin</a>';
+                adminItem.innerHTML = '<a href="#" class="admin-button">Admin</a>';
                 navLinks.appendChild(adminItem);
+                
+                // לחיבור כפתור ה-Admin לפונקציה navigateToAdmin
+                const adminButton = document.querySelector('.admin-button');
+                if (adminButton) {
+                    adminButton.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        navigateToAdmin();
+                    });
+                }
             }
         }
     }
+    
 
-    // טעינת כפתור האזור האישי אם המשתמש מחובר
+    // פונקציה למניעת גישה לעמוד האדמין אם המשתמש אינו מורשה
+    function navigateToAdmin() {
+        if (sessionStorage.getItem("isLoggedIn") === "true" && sessionStorage.getItem("isAdmin") === "true") {
+            // משתמש מורשה - מעבר לעמוד האדמין
+            window.location.href = "/admin.html";
+        } else {
+            // משתמש לא מורשה - הצגת הודעה וניווט לעמוד הבית
+            alert("Access denied: Admins only.");
+            window.location.href = "/homepage.html";
+        }
+    }
+    
+
+    // הצגת כפתור אזור אישי אם המשתמש מחובר
     function loadPersonalAreaButtonIfNeeded() {
         if (sessionStorage.getItem('isLoggedIn') === "true") {
             const navLinks = document.querySelector(".nav-links");
@@ -195,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // עדכון הודעת ברכה
+    // עדכון הודעת ברכה למשתמש
     function updateGreetingMessage() {
         const greetingMessage = document.getElementById("greetingMessage");
         if (sessionStorage.getItem("isLoggedIn") === "true") {
@@ -206,9 +229,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     }
 
-    // פונקציה לאתחול כל אירועי ההדר
+    // אתחול כל האירועים הדרושים ב-Header
     function initializeEventListeners() {
-        // אתחול אלמנטים
         const modal = document.getElementById("loginModal");
         const authButton = document.getElementById("authButton");
         const closeModal = document.querySelector(".close");
@@ -217,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const cartDropdown = document.getElementById('cartDropdown');
         const closeCart = document.getElementById('closeCart');
 
-        // טיפול בכפתור התחברות/יציאה
+        // טיפול בכפתור התחברות/התנתקות
         if (authButton) {
             authButton.addEventListener('click', function(event) {
                 event.preventDefault();
@@ -279,7 +301,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
 
-        // טיפול במודל
+        // טיפול במודל התחברות
         if (closeModal) {
             closeModal.addEventListener("click", () => modal.style.display = "none");
         }
@@ -310,7 +332,16 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
     }
-  
+
+    // הפעלת פונקציה לטעינת קובץ admin.js אם המשתמש בעמוד האדמין
+    const adminButton = document.querySelector('.admin-button');
+    if (adminButton) {
+        adminButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            navigateToAdmin();
+        });
+    }
+
     // פונקציה לטעינת admin.js
     function loadAdminScript() {
         const script = document.createElement('script');
@@ -319,7 +350,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.body.appendChild(script);
     }
 
-//search box
+    // קריאה לפונקציה לטעינת ה-Header
+    await loadHeader();
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.querySelector('.container input[type="text"]');
@@ -405,9 +438,4 @@ document.addEventListener('DOMContentLoaded', function() {
             resultsDiv.style.display = 'none';
         }
     });
-});
-
-
-    // קריאה לפונקציה לטעינת ה-Header
-    await loadHeader();
 });

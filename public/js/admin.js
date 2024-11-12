@@ -1,3 +1,29 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // בדיקת הרשאות משתמש
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    const isAdmin = sessionStorage.getItem('isAdmin');
+
+    // אם המשתמש לא מחובר או לא אדמין, להפנות אותו חזרה לעמוד הבית
+    if (isLoggedIn !== 'true' || isAdmin !== 'true') {
+        alert('Access denied: Admins only.');
+        window.location.href = '/homepage.html';
+        return; // לעצור את המשך הקוד אם המשתמש לא מורשה
+    }
+
+    // אם המשתמש מורשה, המשך לטעינת תוכן ה-Admin
+    initializeAdminPanel();
+});
+
+function initializeAdminPanel() {
+    // קוד אתחול עבור פאנל הניהול
+    // כאן נטען את כל הפונקציות הקיימות כמו loadShoes, loadUsers, וכו'
+    loadShoes();
+    loadUsers();
+    loadOrders();
+    loadGroupedOrders();
+    // וכל פונקציה אחרת הדרושה לפאנל האדמין
+}
+
 // Loading state utilities
 function showLoading(tableId) {
     const tbody = document.getElementById(`${tableId}TableBody`);
