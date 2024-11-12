@@ -97,7 +97,7 @@ class ProductComponent {
         .product-image-container {
             position: relative;
             width: 100%;
-            height: 30vh; /* משתמש בגובה יחסית למסך */
+            height: 30vh;
             overflow: hidden;
         }
 
@@ -131,7 +131,7 @@ class ProductComponent {
             position: relative;
             z-index: 2;
             background: white;
-            padding-top: 0.625rem; /* משתמש ב-rem עבור מרווחים */
+            padding-top: 0.625rem;
         }
 
         .product-info h3 {
@@ -144,7 +144,6 @@ class ProductComponent {
             margin-bottom: 1rem;
         }
 
-        /* סגנונות המודל החדש */
         .modal {
             display: none;
             position: fixed;
@@ -165,17 +164,18 @@ class ProductComponent {
         .modal-content {
             background: white;
             width: 90%;
-            max-width: 60rem; /* משתמש ב-rem במקום פיקסלים */
+            max-width: 60rem;
             border-radius: 0.75rem;
             position: relative;
             padding: 1.25rem;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-body {
             display: flex;
             flex-direction: column;
             gap: 1.875rem;
-            max-height: 90vh;
         }
 
         .close {
@@ -209,7 +209,7 @@ class ProductComponent {
 
         .main-image-container {
             width: 100%;
-            max-width: 25rem;  /* משתמש ב-rem במקום פיקסלים */
+            max-width: 25rem;
             aspect-ratio: 1;
             border-radius: 0.5rem;
             overflow: hidden;
@@ -223,13 +223,13 @@ class ProductComponent {
             transition: transform 0.3s ease;
         }
 
-        /* עדכון סגנונות לתמונות הממוזערות */
         .thumbnail-images {
             display: flex;
             gap: 0.625rem;
             justify-content: center;
             margin-bottom: 0.9375rem;
             padding: 0 0.625rem;
+            flex-wrap: wrap;
         }
 
         .thumbnail-images img {
@@ -355,6 +355,12 @@ class ProductComponent {
             font-size: 1rem;
         }
 
+         .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
         .add-to-cart-btn {
             width: fit-content;
             min-width: 12.5rem;
@@ -377,13 +383,74 @@ class ProductComponent {
         }
 
         @media (max-width: 48rem) {
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+                max-height: 95vh;
+            }
+
             .modal-bottom {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
             .product-info-section {
                 padding-right: 0;
                 text-align: center;
+            }
+
+            .product-selections {
+                gap: 2rem;
+                padding: 1rem 0;
+            }
+
+            .size-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(3.125rem, 1fr));
+                gap: 0.5rem;
+                padding: 0 1rem;
+            }
+
+            .size-options button {
+                width: 100%;
+                min-width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .quantity-controls {
+                margin: 1rem auto;
+            }
+
+            .add-to-cart-btn {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-price {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (max-width: 30rem) {
+            .modal-content {
+                padding: 0.75rem;
+            }
+
+            .main-image-container {
+                max-width: 100%;
+            }
+
+            .thumbnail-images img {
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .size-options {
+                grid-template-columns: repeat(3, 1fr);
             }
         }
 
