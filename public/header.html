@@ -74,10 +74,13 @@
                
             </ul>
         </nav>
-        <div class="container">
-            <input type="text" placeholder="Search...">
-            <button type="submit" class="search"><i class="fas fa-search"></i></button>
-        </div>
+<div class="container">
+    <input type="text" id="searchInput" placeholder="Search...">
+    <button type="submit" class="search" id="searchButton">
+        <i class="fas fa-search"></i>
+    </button>
+    <div class="search-results" id="searchResults"></div>
+</div>
 
         <div class="login-register">
             <a href="#" id="authButton">Login/Register</a>
@@ -106,24 +109,19 @@
                             <path d="M20.12 6.12L3 6l2.67 10.68a2 2 0 0 0 2 1.32h8.66a2 2 0 0 0 2-1.32L20.12 6.12z"/>
                         </svg>
                         <p>Your cart is empty</p>
-                        <a href="#" class="start-shopping">Start Shopping</a>
                     </div>
                 </div>
                 <div class="cart-footer">
                     <div class="cart-total">
                         <span>Total</span>
-                        <span>₪0.00</span>
+                        <span>$0.00</span>
                     </div>
                     <button class="checkout-btn">Proceed to Checkout</button>
                 </div>
             </div>
         </div>
 
-        <div class="hamburger">
-            <div class="line"></div>
-            <div class="line"></div>
-            <div class="line"></div>
-        </div>
+        
     </nav>
 </header>
 

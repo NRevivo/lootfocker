@@ -79,26 +79,25 @@ class ProductComponent {
 
     static addModalStyles() {
         const styles = `
-        /* סגנונות כרטיס המוצר - נשארים זהים */
         .product-card {
             background-color: #fff;
             padding: 1rem;
             text-align: center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0.125rem 0.3125rem rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
         }
 
         .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-0.3125rem);
+            box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2);
         }
 
         .product-image-container {
             position: relative;
             width: 100%;
-            height: 300px;
+            height: 30vh;
             overflow: hidden;
         }
 
@@ -132,7 +131,7 @@ class ProductComponent {
             position: relative;
             z-index: 2;
             background: white;
-            padding-top: 10px;
+            padding-top: 0.625rem;
         }
 
         .product-info h3 {
@@ -145,7 +144,6 @@ class ProductComponent {
             margin-bottom: 1rem;
         }
 
-        /* סגנונות המודל החדש */
         .modal {
             display: none;
             position: fixed;
@@ -166,24 +164,25 @@ class ProductComponent {
         .modal-content {
             background: white;
             width: 90%;
-            max-width: 1000px;
-            border-radius: 12px;
+            max-width: 60rem;
+            border-radius: 0.75rem;
             position: relative;
-            padding: 20px;
+            padding: 1.25rem;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-body {
             display: flex;
             flex-direction: column;
-            gap: 30px;
-            max-height: 90vh;
+            gap: 1.875rem;
         }
 
         .close {
             position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 24px;
+            right: 1.25rem;
+            top: 1.25rem;
+            font-size: 1.5rem;
             cursor: pointer;
             border: none;
             background: none;
@@ -204,17 +203,17 @@ class ProductComponent {
 
         .product-images-section {
             width: 100%;
-            max-width: 600px;
+            max-width: 37.5rem;
             margin: 0 auto;
         }
 
         .main-image-container {
             width: 100%;
-            max-width: 400px;  /* הקטנת הגודל המקסימלי */
+            max-width: 25rem;
             aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             overflow: hidden;
-            margin: 0 auto 15px;
+            margin: 0 auto 0.9375rem;
         }
 
         .main-image {
@@ -224,21 +223,21 @@ class ProductComponent {
             transition: transform 0.3s ease;
         }
 
-        /* עדכון סגנונות לתמונות הממוזערות */
         .thumbnail-images {
             display: flex;
-            gap: 10px;
+            gap: 0.625rem;
             justify-content: center;
-            margin-bottom: 15px;  /* מרווח מהתוכן שמתחת */
-            padding: 0 10px;      /* מרווח מהצדדים */
+            margin-bottom: 0.9375rem;
+            padding: 0 0.625rem;
+            flex-wrap: wrap;
         }
 
         .thumbnail-images img {
-            width: 60px;          /* הקטנת גודל התמונות הממוזערות */
-            height: 60px;
-            border-radius: 8px;
+            width: 3.75rem;
+            height: 3.75rem;
+            border-radius: 0.5rem;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 0.125rem solid transparent;
             transition: all 0.2s ease;
         }
 
@@ -253,37 +252,37 @@ class ProductComponent {
         .modal-bottom {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            gap: 1.875rem;
+            padding-top: 1.25rem;
+            border-top: 0.0625rem solid #e0e0e0;
         }
 
         .product-info-section {
-            padding-right: 20px;
+            padding-right: 1.25rem;
         }
 
         .product-title {
-            font-size: 28px;
-            margin: 0 0 10px 0;
+            font-size: 1.75rem;
+            margin: 0 0 0.625rem 0;
             font-weight: 600;
         }
 
         .product-price {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #000;
-            margin-bottom: 20px;
+            margin-bottom: 1.25rem;
         }
 
         .product-description {
-            font-size: 16px;
+            font-size: 1rem;
             line-height: 1.6;
         }
 
         .product-selections {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 1.25rem;
         }
 
         .size-selection {
@@ -292,20 +291,20 @@ class ProductComponent {
 
         .size-options {
             display: flex;
-            gap: 10px;
+            gap: 0.625rem;
             flex-wrap: wrap;
             justify-content: center;
-            margin-top: 10px;
+            margin-top: 0.625rem;
         }
 
         .size-options button {
-            min-width: 50px;
-            height: 50px;
-            border: 2px solid #e0e0e0;
+            min-width: 3.125rem;
+            height: 3.125rem;
+            border: 0.125rem solid #e0e0e0;
             background: white;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1rem;
             transition: all 0.2s;
         }
 
@@ -326,20 +325,20 @@ class ProductComponent {
         .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
-            max-width: 200px;
-            margin: 10px auto 0;
+            gap: 0.625rem;
+            max-width: 12.5rem;
+            margin: 0.625rem auto 0;
             justify-content: center;
         }
 
         .quantity-btn {
-            width: 40px;
-            height: 40px;
+            width: 2.5rem;
+            height: 2.5rem;
             border: none;
             background: #f5f5f5;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 18px;
+            font-size: 1.125rem;
             transition: background-color 0.2s;
         }
 
@@ -348,55 +347,113 @@ class ProductComponent {
         }
 
         .quantity-input {
-            width: 60px;
-            height: 40px;
+            width: 3.75rem;
+            height: 2.5rem;
             text-align: center;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
+            border: 0.125rem solid #e0e0e0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
         }
 
-        .quantity-input::-webkit-inner-spin-button,
-        .quantity-input::-webkit-outer-spin-button {
+         .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
             -webkit-appearance: none;
             margin: 0;
         }
 
-        .quantity-input {
-            -moz-appearance: textfield;
-        }
-
         .add-to-cart-btn {
             width: fit-content;
-            min-width: 200px;
-            padding: 15px 30px;
-            margin: 20px auto 0;
+            min-width: 12.5rem;
+            padding: 0.9375rem 1.875rem;
+            margin: 1.25rem auto 0;
             display: block;
             background: #000;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 0.5rem;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 1rem;
             font-weight: 600;
             transition: transform 0.2s, background-color 0.2s;
         }
 
         .add-to-cart-btn:hover {
-            transform: translateY(-2px);
+            transform: translateY(-0.125rem);
             background: #333;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 48rem) {
+            .modal-content {
+                width: 95%;
+                padding: 1rem;
+                max-height: 95vh;
+            }
+
             .modal-bottom {
                 grid-template-columns: 1fr;
+                gap: 1rem;
             }
             
             .product-info-section {
                 padding-right: 0;
                 text-align: center;
             }
+
+            .product-selections {
+                gap: 2rem;
+                padding: 1rem 0;
+            }
+
+            .size-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(3.125rem, 1fr));
+                gap: 0.5rem;
+                padding: 0 1rem;
+            }
+
+            .size-options button {
+                width: 100%;
+                min-width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .quantity-controls {
+                margin: 1rem auto;
+            }
+
+            .add-to-cart-btn {
+                width: 100%;
+                margin: 1rem 0;
+            }
+
+            .product-title {
+                font-size: 1.5rem;
+            }
+
+            .product-price {
+                font-size: 1.25rem;
+            }
         }
+
+        @media (max-width: 30rem) {
+            .modal-content {
+                padding: 0.75rem;
+            }
+
+            .main-image-container {
+                max-width: 100%;
+            }
+
+            .thumbnail-images img {
+                width: 3rem;
+                height: 3rem;
+            }
+
+            .size-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         `;
 
         const styleSheet = document.createElement("style");
@@ -451,7 +508,7 @@ class ProductComponent {
             const modal = document.getElementById('productModal');
     
             modal.querySelector('.product-title').textContent = product.name;
-            modal.querySelector('.product-price').textContent = `₪${product.price.toFixed(2)}`;
+            modal.querySelector('.product-price').textContent = `$${product.price.toFixed(2)}`;
             modal.querySelector('.product-description p').textContent = product.description;
     
             const mainImage = modal.querySelector('.main-image');
