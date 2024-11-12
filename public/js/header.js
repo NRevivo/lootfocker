@@ -19,13 +19,13 @@ window.CartUtilities = {
                         <path d="M20.12 6.12L3 6l2.67 10.68a2 2 0 0 0 2 1.32h8.66a2 2 0 0 0 2-1.32L20.12 6.12z"/>
                     </svg>
                     <p>Your cart is empty</p>
-                    <a href="#" class="start-shopping">Start Shopping</a>
+                    
                 </div>
             `;
             if (cartTotal) {
                 cartTotal.innerHTML = `
                     <span>Total</span>
-                    <span>₪0.00</span>
+                    <span>$0.00</span>
                 `;
             }
             return;
@@ -56,7 +56,7 @@ window.CartUtilities = {
                         </div>
                         <p>Size: ${item.size}</p>
                         <p>Quantity: ${item.quantity}</p>
-                        <p>Price: ₪${itemTotal.toFixed(2)}</p>
+                        <p>Price: $${itemTotal.toFixed(2)}</p>
                     </div>
                 </div>
             `;
@@ -68,7 +68,7 @@ window.CartUtilities = {
         if (cartTotal) {
             cartTotal.innerHTML = `
                 <span>Total</span>
-                <span>₪${total.toFixed(2)}</span>
+                <span>$${total.toFixed(2)}</span>
             `;
         }
     },
@@ -318,6 +318,95 @@ document.addEventListener('DOMContentLoaded', async function() {
         script.defer = true;
         document.body.appendChild(script);
     }
+
+//search box
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.container input[type="text"]');
+    const searchButton = document.querySelector('.container .search');
+
+    // טיפול בלחיצה על כפתור החיפוש
+    searchButton.addEventListener('click', function() {
+        handleSearch();
+    });
+
+    // טיפול בלחיצה על Enter
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    });
+
+    // חיפוש אוטומטי בזמן הקלדה עם השהייה
+    let debounceTimer;
+    searchInput.addEventListener('input', function(e) {
+        clearTimeout(debounceTimer);
+        const searchTerm = e.target.value.trim();
+        
+        if (searchTerm.length < 2) return;
+
+        debounceTimer = setTimeout(async () => {
+            try {
+                const response = await fetch(`/api/shoes/filter?name=${encodeURIComponent(searchTerm)}`);
+                const shoes = await response.json();
+                
+                // מציג עד 5 תוצאות בהשלמה האוטומטית
+                displayAutoComplete(shoes.slice(0, 5));
+            } catch (error) {
+                console.error('Search error:', error);
+            }
+        }, 300);
+    });
+
+    function handleSearch() {
+        const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+            // משתמש באותו נתיב שמשמש לסינון קטגוריות
+            window.location.href = `/results.html?name=${encodeURIComponent(searchTerm)}`;
+        }
+    }
+
+    function displayAutoComplete(shoes) {
+        let resultsDiv = document.querySelector('.search-results');
+        if (!resultsDiv) {
+            resultsDiv = document.createElement('div');
+            resultsDiv.className = 'search-results';
+            searchInput.parentNode.appendChild(resultsDiv);
+        }
+
+        if (shoes.length === 0) {
+            resultsDiv.style.display = 'none';
+            return;
+        }
+
+        const html = shoes.map(shoe => `
+            <div class="search-result-item" onclick="window.location.href='/product.html?id=${shoe._id}'">
+                <div class="search-result-image">
+                    ${shoe.images && shoe.images[0] ? 
+                        `<img src="${shoe.images[0]}" alt="${shoe.name}">` :
+                        '<div class="no-image"></div>'
+                    }
+                </div>
+                <div class="search-result-info">
+                    <div class="search-result-name">${shoe.name}</div>
+                    <div class="search-result-price">$${shoe.price.toFixed(2)}</div>
+                </div>
+            </div>
+        `).join('');
+
+        resultsDiv.innerHTML = html;
+        resultsDiv.style.display = 'block';
+    }
+
+    // סגירת תוצאות בלחיצה מחוץ לאזור החיפוש
+    document.addEventListener('click', function(e) {
+        const resultsDiv = document.querySelector('.search-results');
+        if (resultsDiv && !searchInput.parentNode.contains(e.target)) {
+            resultsDiv.style.display = 'none';
+        }
+    });
+});
+
 
     // קריאה לפונקציה לטעינת ה-Header
     await loadHeader();
