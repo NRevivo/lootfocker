@@ -451,7 +451,7 @@ class ProductComponent {
             const modal = document.getElementById('productModal');
     
             modal.querySelector('.product-title').textContent = product.name;
-            modal.querySelector('.product-price').textContent = `₪${product.price.toFixed(2)}`;
+            modal.querySelector('.product-price').textContent = `$${product.price.toFixed(2)}`;
             modal.querySelector('.product-description p').textContent = product.description;
     
             const mainImage = modal.querySelector('.main-image');

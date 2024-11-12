@@ -679,6 +679,7 @@ app.delete('/api/cart/:userId/:itemId', async (req, res) => {
   }
 });
 
+
   // Start the server
   server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
