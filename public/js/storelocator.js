@@ -38,16 +38,19 @@ function addMarkersToMap(branches) {
             map: map,
             icon: {
                 url: '/images/lf.png', // הנתיב לתמונה שהגדרת
-                scaledSize: new google.maps.Size(20, 20) // גודל חדש, נסה לשנות לפי הצורך
+                scaledSize: new google.maps.Size(20, 20) // הגדרת גודל הסמל
             },
             title: branch.name,
         });
         markers.push(marker);
-        
+
+        const addressContent = `
+            <h3>${branch.name}</h3>
+            <p>${branch.address.street}, ${branch.address.city}, ${branch.address.country}</p>
+        `;
+
         const infoWindow = new google.maps.InfoWindow({
-            content: `<h3>${branch.name}</h3>
-                      <p>${branch.address.street}, ${branch.address.city}, ${branch.address.country}</p>
-                      <small>${branch.address.zip}</small>`,
+            content: addressContent,
         });
 
         marker.addListener('click', () => {
@@ -55,6 +58,7 @@ function addMarkersToMap(branches) {
         });
     });
 }
+
 
 
 // פונקציה לניקוי markers קיימים מהמפה
