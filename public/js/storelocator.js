@@ -13,18 +13,18 @@ async function loadBranches() {
     }
 }
 
-// פונקציה להצגת רשימת הסניפים בצד שמאל של הדף
+// פונקציה להצגת רשימת הסניפים בטבלה
 function displayStores(branches) {
     const storeList = document.getElementById('store-list');
     storeList.innerHTML = ''; // איפוס התוכן הקיים
 
     branches.forEach(branch => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td><strong>${branch.name}</strong></td>
+        const storeItem = document.createElement('tr');
+        storeItem.innerHTML = `
+            <td>${branch.name}</td>
             <td>${branch.address.street}, ${branch.address.city}, ${branch.address.country}</td>
         `;
-        storeList.appendChild(row);
+        storeList.appendChild(storeItem);
     });
 }
 
@@ -36,13 +36,18 @@ function addMarkersToMap(branches) {
         const marker = new google.maps.Marker({
             position: { lat: branch.location.latitude, lng: branch.location.longitude },
             map: map,
+            icon: {
+                url: '/images/lf.png', // הנתיב לתמונה שהגדרת
+                scaledSize: new google.maps.Size(20, 20) // גודל חדש, נסה לשנות לפי הצורך
+            },
             title: branch.name,
         });
         markers.push(marker);
         
         const infoWindow = new google.maps.InfoWindow({
             content: `<h3>${branch.name}</h3>
-                      <p>${branch.address.street}, ${branch.address.city}, ${branch.address.country}</p>`,
+                      <p>${branch.address.street}, ${branch.address.city}, ${branch.address.country}</p>
+                      <small>${branch.address.zip}</small>`,
         });
 
         marker.addListener('click', () => {
@@ -50,6 +55,7 @@ function addMarkersToMap(branches) {
         });
     });
 }
+
 
 // פונקציה לניקוי markers קיימים מהמפה
 function clearMarkers() {
