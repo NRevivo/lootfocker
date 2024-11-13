@@ -3,18 +3,17 @@ document.addEventListener('DOMContentLoaded', function () {
     initializePayPalButton();
 });
 
-// Function to load cart items
 async function loadCartItems() {
     const userId = sessionStorage.getItem('userId');
     if (!userId) {
         console.error("User ID not found.");
         return;
     }
-    
+
     try {
         const response = await fetch(`/api/cart/${userId}`);
         const data = await response.json();
-        console.log("Cart data:", data.cart); // בדיקה של נתוני העגלה
+
         if (data.success && data.cart) {
             displayCartItems(data.cart);
         } else {
@@ -25,9 +24,6 @@ async function loadCartItems() {
     }
 }
 
-
-// Function to display cart items in the checkout page
-// Function to display cart items in the checkout page
 function displayCartItems(cart) {
     const cartItemsContainer = document.querySelector('.cart-items-list');
     let html = '';
@@ -49,46 +45,53 @@ function displayCartItems(cart) {
         `;
     });
 
-    // הוספת הסכום הכולל בסוף הרשימה
     html += `
         <div class="cart-total">
             <strong>Total Price:</strong> $${totalPrice.toFixed(2)}
         </div>
     `;
-
     cartItemsContainer.innerHTML = html;
+    
+    // Store total price for checkout
+    sessionStorage.setItem('totalPrice', totalPrice.toFixed(2));
 }
 
-
-// Function to initialize PayPal payment button
 function initializePayPalButton() {
     paypal.Buttons({
         createOrder: function () {
-            const form = document.getElementById('shippingForm');
-            if (!form.checkValidity()) {
-                alert('Please fill in all required shipping details.');
+            const totalPrice = sessionStorage.getItem('totalPrice');
+            if (!totalPrice) {
+                alert("Total price not found.");
                 return false;
             }
 
-            return fetch('/api/create-paypal-order', {
+            return fetch('http://localhost:3000/api/create-paypal-order', { 
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    items: getCartItemsForCheckout(),
+                    totalAmount: totalPrice,
                     shipping: getShippingDetails()
                 })
-            }).then(res => res.json()).then(data => {
+            }).then(res => {
+                if (!res.ok) {
+                    throw new Error(`Server responded with status ${res.status}`);
+                }
+                return res.json();
+            }).then(data => {
                 if (data && data.orderID) {
                     return data.orderID;
                 } else {
                     throw new Error('Failed to create order');
                 }
+            }).catch(error => {
+                console.error('Error during createOrder:', error);
+                alert("Error creating order. Please try again.");
             });
         },
         onApprove: function (data) {
-            return fetch('/api/capture-paypal-order', {
+            return fetch('http://localhost:3000/api/capture-paypal-order', { // גם כאן השתמש בכתובת מלאה
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -97,30 +100,26 @@ function initializePayPalButton() {
                     orderID: data.orderID
                 })
             }).then(response => {
-                if (response.ok) {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
+            }).then(orderData => {
+                if (orderData.success) {
                     alert('Purchase completed successfully!');
                     window.location.href = '/confirmation.html';
+                } else {
+                    throw new Error('Failed to capture order');
                 }
+            }).catch(error => {
+                console.error('Error during onApprove:', error);
+                alert("Error capturing order. Please try again.");
             });
         }
     }).render('#paypal-button-container');
 }
 
 
-// Helper function to gather cart items in a specific format for checkout
-function getCartItemsForCheckout() {
-    const items = [];
-    document.querySelectorAll('.cart-item').forEach(itemElement => {
-        console.log(itemElement.innerHTML); // בדוק את מבנה ה-HTML המלא של כל פריט בעגלה
-        items.push({
-            id: itemElement.getAttribute('data-item-id'),
-            quantity: parseInt(itemElement.querySelector('.quantity').textContent)
-        });
-    });
-    return items;
-}
-
-// Helper function to gather shipping details from the form
 function getShippingDetails() {
     return {
         fullName: document.getElementById('fullName').value,

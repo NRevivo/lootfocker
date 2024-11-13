@@ -704,7 +704,7 @@ app.get('/api/branches', async (req, res) => {
 
 
 // --------------------PayPal--------------------------------------------------------
-app.get("/api/config/paypal"), (req, res)=> res.send({clientId:process.env.PAYPAL_CLIENT_ID})
+app.get("/api/config/paypal", (req, res) => res.send({ clientId: process.env.PAYPAL_CLIENT_ID }));
 
 const paypal = require('@paypal/checkout-server-sdk');
 
@@ -718,40 +718,38 @@ function getPayPalClient() {
 
 // יצירת הזמנה חדשה ב-PayPal
 app.post('/api/create-paypal-order', async (req, res) => {
-    const { items, shipping } = req.body;
+  const { totalAmount, shipping } = req.body;
 
-    // חישוב סכום ההזמנה לפי פריטי העגלה
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const request = new paypal.orders.OrdersCreateRequest();
+  request.prefer("return=representation");
+  request.requestBody({
+      intent: 'CAPTURE',
+      purchase_units: [{
+          amount: {
+              currency_code: 'USD',
+              value: totalAmount
+          },
+          shipping: {
+              name: { full_name: shipping.fullName },
+              address: {
+                  address_line_1: shipping.address,
+                  admin_area_2: shipping.city,
+                  postal_code: shipping.postalCode,
+                  country_code: 'US'
+              }
+          }
+      }]
+  });
 
-    const request = new paypal.orders.OrdersCreateRequest();
-    request.prefer("return=representation");
-    request.requestBody({
-        intent: 'CAPTURE',
-        purchase_units: [{
-            amount: {
-                currency_code: 'USD',
-                value: totalAmount.toFixed(2)
-            },
-            shipping: {
-                name: { full_name: shipping.fullName },
-                address: {
-                    address_line_1: shipping.address,
-                    admin_area_2: shipping.city,
-                    postal_code: shipping.postalCode,
-                    country_code: 'US'
-                }
-            }
-        }]
-    });
-
-    try {
-        const order = await getPayPalClient().execute(request);
-        res.json({ orderID: order.result.id });
-    } catch (error) {
-        console.error('Error creating PayPal order:', error);
-        res.status(500).json({ error: 'Failed to create order' });
-    }
+  try {
+      const order = await getPayPalClient().execute(request);
+      res.json({ orderID: order.result.id });
+  } catch (error) {
+      console.error('Error creating PayPal order:', error);
+      res.status(500).json({ error: 'Failed to create order' });
+  }
 });
+
 
 // לכידת הזמנה לאחר אישור תשלום מ-PayPal
 app.post('/api/capture-paypal-order', async (req, res) => {
