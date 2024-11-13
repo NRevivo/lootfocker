@@ -16,7 +16,6 @@ style.textContent = `
         z-index: 1000;
         margin-top: 5px;
     }
-        
     .search-result-item {
         display: flex;
         padding: 10px;
@@ -133,7 +132,7 @@ export default class Search {
     
         console.log('Event listeners set up');
     }
-
+    
     async handleSearchInput() {
         const query = this.searchInput.value.trim();
         console.log('Search query:', query);

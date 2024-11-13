@@ -355,12 +355,6 @@ class ProductComponent {
             font-size: 1rem;
         }
 
-         .quantity-input::-webkit-outer-spin-button,
-        .quantity-input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
         .add-to-cart-btn {
             width: fit-content;
             min-width: 12.5rem;
