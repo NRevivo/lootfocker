@@ -17,12 +17,24 @@
     <div id="header-container"></div>
     <!-- לשונית עליונה -->
 
-    <!-- קוד להצגת מפת החנויות -->
-    <section class="map-section">
-        <h2>Find Our Stores</h2>
-        <div id="map" style="width: 640px; height: 480px;"></div>
+    <section class="store-locator-container">
+        <div class="store-details-table">
+            <h2>Find Our Stores</h2>
+            <table class="store-table">
+                <thead>
+                    <tr>
+                        <th>Store Name</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody id="store-list">
+                    <!-- התוכן של הסניפים יתווסף כאן -->
+                </tbody>
+            </table>
+        </div>
+        <div id="map"></div>
     </section>
-
+    
     <!-- לשונית תחתונה -->
     <div id="footer-container"></div>
     <script src="js/footer.js"></script>
@@ -30,7 +42,7 @@
     
     <!-- Google Maps JavaScript API -->
     <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfdAt7Mx6RWexvVpp8OC9gsabWVyX7IxE&callback=initMap">
-</script>
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDfdAt7Mx6RWexvVpp8OC9gsabWVyX7IxE&callback=initMap">
+    </script>
 </body>
 </html>
