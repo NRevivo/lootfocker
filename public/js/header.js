@@ -258,6 +258,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             });
         }
 
+         // מאזין ללחיצה על כפתור ה-Checkout
+        const checkoutButton = document.querySelector('.checkout-btn');
+             if (checkoutButton) {
+                 checkoutButton.addEventListener('click', function() {
+                 window.location.href = 'checkout.html';
+        });
+        }
+
         // טיפול בטופס התחברות
         if (loginForm) {
             loginForm.addEventListener("submit", async function(event) {
@@ -437,5 +445,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (resultsDiv && !searchInput.parentNode.contains(e.target)) {
             resultsDiv.style.display = 'none';
         }
-    });
+    }); 
 });
+
+
+
