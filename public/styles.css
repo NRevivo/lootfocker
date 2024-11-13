@@ -351,39 +351,262 @@ nav {
     color: #ff0000;
 }
 
-
-
-/* Search Bar Styling */
-.container {
+/* ================ Search Container ================ */
+.search-container {
+    position: relative;
     display: flex;
     align-items: center;
-    background-color: #f9f9f9;
-    padding: 0.3rem;
-    border-radius: 25px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    margin-right: 20px;
+    margin: 0 1rem;
+    width: 100%;
+    max-width: 25rem;
 }
 
-.container input[type="text"] {
-    font-family: 'Roboto', sans-serif;
-    width: 150px;
-    height: 30px;
-    border: none;
+/* ================ Search Input ================ */
+#searchInput {
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 0.0625rem solid rgba(255, 255, 255, 0.2);
+    border-radius: 1.25rem;
+    color: white;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+#searchInput:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
     outline: none;
-    padding-left: 10px;
+    box-shadow: 0 0 0 0.125rem rgba(255, 255, 255, 0.1);
+}
+
+/* ================ Search Button ================ */
+#searchButton {
+    position: absolute;
+    right: 0.625rem;
     background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#searchButton:hover {
+    color: #ff0000;
+}
+
+/* ================ Search Results Container ================ */
+.search-results {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-top: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    display: flex;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.search-result-item:last-child {
+    border-bottom: none;
+}
+
+.search-result-item:hover {
+    background-color: #f8f8f8;
+}
+
+.search-result-image {
+    width: 60px;
+    height: 60px;
+    margin-right: 15px;
+    flex-shrink: 0;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.search-result-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.search-result-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.search-result-name {
     color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.3;
+}
+
+.search-result-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.search-result-price {
+    color: #000;  /* שינוי צבע המחיר לשחור */
+    font-weight: 600;  /* הדגשת המחיר */
     font-size: 14px;
 }
 
-.container .search {
-    background: #000;
-    padding: 0 10px;
-    height: 30px;
-    border: none;
-    border-radius: 0 25px 25px 0;
+/* כפתור "הצג הכל" */
+.view-all-results {
+    padding: 12px;
+    text-align: center;
+    background: #f5f5f5;
+    color: #333;
+    font-weight: 500;
     cursor: pointer;
-    color: #fff;
+    border-top: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.view-all-results:hover {
+    background: #e8e8e8;
+}
+
+/* סגנונות למצבי שגיאה ו"אין תוצאות" */
+.search-loading,
+.search-error,
+.no-results {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+/* Custom scrollbar */
+.search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #ccc;
+}
+
+/* ================ Animations ================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.search-results {
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* ================ Media Queries ================ */
+@media screen and (max-width: 64rem) { /* 1024px */
+    .search-container {
+        max-width: 20rem;
+    }
+}
+
+@media screen and (max-width: 48rem) { /* 768px */
+    .search-container {
+        max-width: 18rem;
+        margin: 0 0.5rem;
+    }
+
+    #searchInput {
+        font-size: 0.8125rem;
+    }
+
+    .search-results {
+        max-height: 18.75rem;
+    }
+
+    .search-result-item {
+        padding: 0.625rem;
+    }
+
+    .search-result-image {
+        width: 3rem;
+        height: 3rem;
+        margin-right: 0.75rem;
+    }
+
+    .search-result-name {
+        font-size: 0.8125rem;
+    }
+}
+
+@media screen and (max-width: 36rem) { /* 576px */
+    .search-container {
+        max-width: 15rem;
+    }
+
+    #searchInput {
+        padding: 0.375rem 2rem 0.375rem 0.75rem;
+    }
+
+    .search-results {
+        max-height: 15rem;
+    }
+
+    .search-result-image {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-right: 0.5rem;
+    }
+
+    .search-result-name {
+        font-size: 0.75rem;
+        -webkit-line-clamp: 1;
+    }
+
+    .search-result-info {
+        font-size: 0.6875rem;
+    }
+
+    .view-all-results {
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
 }
 
 /* Login/Register Styling */
@@ -2244,11 +2467,24 @@ body {
     font-size: 14px;
 }
 
-.search-loading,
-.search-error,
-.no-results {
+.search-results .no-results {
     padding: 15px;
     text-align: center;
-    color: white;
+    color: #333;           /* שינוי צבע הטקסט לכהה */
+    background: #f5f5f5;   /* הוספת רקע בהיר */
+    border-radius: 4px;    /* פינות מעוגלות */
+    margin: 5px;           /* מרווח מהשוליים */
+}
+
+/* אם רוצים להוסיף אייקון ועיצוב נוסף */
+.search-results .no-results {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background: #f8f9fa;
+    color: #333;
+    font-weight: 500;
 }
 /* ---------------------- search box ----------------------------------*/

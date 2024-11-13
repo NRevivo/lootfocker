@@ -338,52 +338,104 @@ app.get('/api/orders/:userId', async (req, res) => {
 // Route to filter shoes
 app.get('/api/shoes/filter', async (req, res) => {
   try {
-      const { category, brand, sizes, minPrice, maxPrice } = req.query;
+      const { category, brand, sizes, minPrice, maxPrice, searchQuery } = req.query;
       let filter = {};
-      
-      // Updated category filtering to match URL parameters
+
+      // חיפוש לפי שם ומותג
+      if (searchQuery) {
+          filter.$or = [
+              { name: { $regex: searchQuery, $options: 'i' }},
+              { brand: { $regex: searchQuery, $options: 'i' }}
+          ];
+      }
+
+      // קטגוריה
       if (category) {
-          // Handle specific categories exactly as they appear in the URL
           switch(category) {
               case 'Boy':
               case 'Girl':
               case 'Baby':
               case 'Men':
               case 'Women':
-                  filter.category = category;
+                  if (filter.$or) {
+                      filter.$and = [{ $or: filter.$or }, { category: category }];
+                      delete filter.$or;
+                  } else {
+                      filter.category = category;
+                  }
                   break;
               default:
-                  filter.category = category;
+                  if (filter.$or) {
+                      filter.$and = [{ $or: filter.$or }, { category: category }];
+                      delete filter.$or;
+                  } else {
+                      filter.category = category;
+                  }
           }
       }
-      
-      // Brand filtering
+
+      // מותג
       if (brand) {
-          filter.brand = { $in: brand.split(',') };
+          const brandFilter = { brand: { $in: brand.split(',') } };
+          if (filter.$and) {
+              filter.$and.push(brandFilter);
+          } else if (filter.$or) {
+              filter.$and = [{ $or: filter.$or }, brandFilter];
+              delete filter.$or;
+          } else {
+              filter.brand = brandFilter.brand;
+          }
       }
-      
-      // Size filtering
+
+      // מידות
       if (sizes) {
-          filter.sizes = { $in: sizes.split(',').map(Number) };
+          const sizesFilter = { sizes: { $in: sizes.split(',').map(Number) } };
+          if (filter.$and) {
+              filter.$and.push(sizesFilter);
+          } else if (filter.$or) {
+              filter.$and = [{ $or: filter.$or }, sizesFilter];
+              delete filter.$or;
+          } else {
+              filter.sizes = sizesFilter.sizes;
+          }
       }
-      
-      // Price filtering
+
+      // מחיר
       if (minPrice || maxPrice) {
-          filter.price = {};
-          if (minPrice) filter.price.$gte = Number(minPrice);
-          if (maxPrice) filter.price.$lte = Number(maxPrice);
+          const priceFilter = {};
+          if (minPrice) priceFilter.$gte = Number(minPrice);
+          if (maxPrice) priceFilter.$lte = Number(maxPrice);
+
+          if (filter.$and) {
+              filter.$and.push({ price: priceFilter });
+          } else if (filter.$or) {
+              filter.$and = [{ $or: filter.$or }, { price: priceFilter }];
+              delete filter.$or;
+          } else {
+              filter.price = priceFilter;
+          }
       }
 
       console.log('Applied filter:', filter);
 
-      const shoes = await Shoe.find(filter);
+      // שינוי כאן - הוספת select כדי לוודא שכל השדות הנדרשים מוחזרים
+      const shoes = await Shoe.find(filter)
+          .select('name brand price images sizes description')  // בחירת השדות הספציפיים שאנחנו רוצים
+          .lean()  // המרה לאובייקט JavaScript רגיל לביצועים טובים יותר
+          .exec();
+
+      // לוג לבדיקת המידע שמוחזר
+      console.log('Returning shoes data:', shoes.slice(0, 2));  // מדפיס רק את 2 המוצרים הראשונים ללוג
+
       res.json(shoes);
   } catch (err) {
       console.error('Filter error:', err);
-      res.status(500).send('Server Error');
+      res.status(500).json({
+          message: 'Server Error',
+          error: err.message
+      });
   }
 });
-
 
 // הוסף את הנתיב הזה בקובץ server.js
 app.get('/api/shoes/latest', async (req, res) => {

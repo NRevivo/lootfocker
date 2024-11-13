@@ -153,7 +153,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         loadPersonalAreaButtonIfNeeded();
         initializeEventListeners();
         updateGreetingMessage();
-        window.CartUtilities.loadCart();    
+        window.CartUtilities.loadCart();  
+        initializeSearch(); 
+  
     }
 
     // עדכון טקסט הכפתור התחברות/התנתקות
@@ -249,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     sessionStorage.removeItem('email');
                     sessionStorage.removeItem('fullName');
                     sessionStorage.removeItem('userId');
+                    localStorage.clear(); 
                     updateAuthButton();
                     updateGreetingMessage();
                     window.location.reload();
@@ -354,88 +357,153 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadHeader();
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.querySelector('.container input[type="text"]');
-    const searchButton = document.querySelector('.container .search');
 
-    // טיפול בלחיצה על כפתור החיפוש
-    searchButton.addEventListener('click', function() {
-        handleSearch();
+
+async function loadProductComponent() {
+    // בדיקה אם הקומפוננטה כבר טעונה
+    if (window.ProductComponent) {
+        return window.ProductComponent;
+    }
+
+    // טעינת הסקריפט אם לא נטען
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/js/productComponent.js';
+        script.type = 'module';  // חשוב! מכיוון שיש export בקובץ
+
+        script.onload = async () => {
+            try {
+                // יבוא דינמי של המודול
+                const module = await import('/js/productComponent.js');
+                window.ProductComponent = module.default;
+                resolve(window.ProductComponent);
+            } catch (error) {
+                reject(error);
+            }
+        };
+
+        script.onerror = () => {
+            reject(new Error('Failed to load ProductComponent'));
+        };
+
+        document.head.appendChild(script);
     });
+}
 
-    // טיפול בלחיצה על Enter
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            handleSearch();
+
+// פונקציית החיפוש המעודכנת
+function initializeSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchResults = document.getElementById('searchResults');
+
+    if (!searchInput || !searchButton || !searchResults) {
+        console.error('Search elements not found');
+        return;
+    }
+
+    async function displayResults(products, query) {
+        if (!Array.isArray(products) || products.length === 0) {
+            searchResults.innerHTML = `
+                <div class="no-results">
+                    <p>No products found</p>
+                </div>
+            `;
+            searchResults.style.display = 'block';
+            return;
         }
-    });
-
-    // חיפוש אוטומטי בזמן הקלדה עם השהייה
-    let debounceTimer;
-    searchInput.addEventListener('input', function(e) {
-        clearTimeout(debounceTimer);
-        const searchTerm = e.target.value.trim();
+    
+        const limitedProducts = products.slice(0, 3);
         
-        if (searchTerm.length < 2) return;
+        const html = limitedProducts.map(product => {
+            const productName = product.name || '';
+            const brandName = product.brand || '';
+            const fullProductName = `${brandName} ${productName}`.trim();
+            const price = product.price ? `$${product.price.toFixed(2)}` : 'Price not available';
+            const imageUrl = product.images && product.images.length > 0 ? product.images[0] : '';
+            const size = product.sizes && product.sizes.length > 0 ? product.sizes[0] : 'N/A';
+    
+            return `
+                <div class="search-result-item" data-product-id="${product._id}">
+                    <img src="${imageUrl}" alt="${fullProductName}" class="search-result-image">
+                    <div class="search-result-details">
+                        <div class="search-result-name" style="font-weight: bold; color: #333; margin-bottom: 5px;">
+                            ${fullProductName}
+                        </div>
+                        <div class="search-result-info">
+                            <div class="search-result-size">Size: ${size}</div>
+                            <div class="search-result-price">${price}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    
+        const viewAllButton = products.length > 3 ? `
+            <div class="view-all-results" onclick="window.location.href='/results.html?searchQuery=${encodeURIComponent(query)}'">
+                View all ${products.length} results
+            </div>
+        ` : '';
+    
+        searchResults.innerHTML = html + viewAllButton;
+        searchResults.style.display = 'block';
+
+        // הוספת מאזיני לחיצה לכל תוצאת חיפוש
+        const searchResultItems = searchResults.querySelectorAll('.search-result-item');
+        searchResultItems.forEach(item => {
+            item.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    const productId = this.dataset.productId;
+                    const ProductComponent = await loadProductComponent();
+                    
+                    // אתחול ProductComponent אם צריך
+                    if (ProductComponent.init) {
+                        await ProductComponent.init();
+                    }
+                    
+                    // פתיחת המודל
+                    await ProductComponent.openProductModal(productId);
+                } catch (error) {
+                    console.error('Error handling product click:', error);
+                }
+            });
+        });
+    }
+
+    let debounceTimer;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const query = searchInput.value.trim();
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
+        }
 
         debounceTimer = setTimeout(async () => {
             try {
-                const response = await fetch(`/api/shoes/filter?name=${encodeURIComponent(searchTerm)}`);
-                const shoes = await response.json();
+                const response = await fetch(`/api/shoes/filter?searchQuery=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Search request failed');
                 
-                // מציג עד 5 תוצאות בהשלמה האוטומטית
-                displayAutoComplete(shoes.slice(0, 5));
+                const products = await response.json();
+                displayResults(products, query);
             } catch (error) {
                 console.error('Search error:', error);
+                searchResults.style.display = 'none';
             }
         }, 300);
     });
 
-    function handleSearch() {
-        const searchTerm = searchInput.value.trim();
-        if (searchTerm) {
-            // משתמש באותו נתיב שמשמש לסינון קטגוריות
-            window.location.href = `/results.html?name=${encodeURIComponent(searchTerm)}`;
-        }
-    }
-
-    function displayAutoComplete(shoes) {
-        let resultsDiv = document.querySelector('.search-results');
-        if (!resultsDiv) {
-            resultsDiv = document.createElement('div');
-            resultsDiv.className = 'search-results';
-            searchInput.parentNode.appendChild(resultsDiv);
-        }
-
-        if (shoes.length === 0) {
-            resultsDiv.style.display = 'none';
-            return;
-        }
-
-        const html = shoes.map(shoe => `
-            <div class="search-result-item" onclick="window.location.href='/product.html?id=${shoe._id}'">
-                <div class="search-result-image">
-                    ${shoe.images && shoe.images[0] ? 
-                        `<img src="${shoe.images[0]}" alt="${shoe.name}">` :
-                        '<div class="no-image"></div>'
-                    }
-                </div>
-                <div class="search-result-info">
-                    <div class="search-result-name">${shoe.name}</div>
-                    <div class="search-result-price">$${shoe.price.toFixed(2)}</div>
-                </div>
-            </div>
-        `).join('');
-
-        resultsDiv.innerHTML = html;
-        resultsDiv.style.display = 'block';
-    }
-
     // סגירת תוצאות בלחיצה מחוץ לאזור החיפוש
-    document.addEventListener('click', function(e) {
-        const resultsDiv = document.querySelector('.search-results');
-        if (resultsDiv && !searchInput.parentNode.contains(e.target)) {
-            resultsDiv.style.display = 'none';
+    document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
         }
     });
-});
+}
+
+// הוספת הפונקציה לאובייקט החלון
+window.initializeSearch = initializeSearch;

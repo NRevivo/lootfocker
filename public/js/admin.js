@@ -15,6 +15,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeAdminPanel() {
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'isLoggedIn' || e.key === 'isAdmin') {
+            checkAdminAccess();
+        }
+    });
     // קוד אתחול עבור פאנל הניהול
     // כאן נטען את כל הפונקציות הקיימות כמו loadShoes, loadUsers, וכו'
     loadShoes();

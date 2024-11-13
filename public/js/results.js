@@ -8,12 +8,13 @@ class ResultsPage {
             brand: this.urlParams.get('brand') ? [this.urlParams.get('brand')] : [],
             sizes: [],
             minPrice: null,
-            maxPrice: null
+            maxPrice: null,
+            searchQuery: this.urlParams.get('searchQuery') || '' // הוספת פרמטר החיפוש
         };
         
         console.log('Initial filters:', this.filters);
     }
-
+    
     async init() {
         try {
             // Initialize product component
@@ -37,10 +38,14 @@ class ResultsPage {
         try {
             const params = new URLSearchParams();
             
+            // עדכון פרמטרי החיפוש והסינון
+            if (this.filters.searchQuery) {
+                params.append('searchQuery', this.filters.searchQuery);
+                console.log('Searching for:', this.filters.searchQuery); // לבדיקה
+            }
+            
             if (this.filters.category) {
-                if (['Men', 'Women', 'Boy', 'Girl', 'Baby'].includes(this.filters.category)) {
-                    params.append('category', this.filters.category);
-                }
+                params.append('category', this.filters.category);
             }
             
             if (this.filters.brand.length) {
@@ -58,19 +63,27 @@ class ResultsPage {
             if (this.filters.maxPrice !== null) {
                 params.append('maxPrice', this.filters.maxPrice);
             }
-            
+    
+            // שימוש בנתיב הפילטר הקיים
             const response = await fetch(`/api/shoes/filter?${params.toString()}`);
+            console.log('Fetching URL:', `/api/shoes/filter?${params.toString()}`); // לבדיקה
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const products = await response.json();
+            console.log('Received products:', products); // לבדיקה
             
             const container = document.querySelector('.products-grid');
             const resultsInfo = document.querySelector('.results-info');
             
             if (resultsInfo) {
-                resultsInfo.textContent = `Showing ${products.length} results`;
+                if (this.filters.searchQuery) {
+                    resultsInfo.textContent = `Found ${products.length} results for "${this.filters.searchQuery}"`;
+                } else {
+                    resultsInfo.textContent = `Showing ${products.length} results`;
+                }
             }
             
             if (!container) {
@@ -93,10 +106,16 @@ class ResultsPage {
             console.error('Error loading products:', error);
             const container = document.querySelector('.products-grid');
             if (container) {
-                container.innerHTML = '<p class="error-message">Error loading products. Please try again later.</p>';
+                container.innerHTML = `
+                    <p class="error-message">
+                        Error loading products. Please try again later.<br>
+                        <small>Error details: ${error.message}</small>
+                    </p>`;
             }
         }
     }
+
+    
 
     async initializeFilters() {
         try {
