@@ -28,6 +28,7 @@ function displayCartItems(cart) {
     const cartItemsContainer = document.querySelector('.cart-items-list');
     let html = '';
     let totalPrice = 0;
+    const shoes = cart.map(item => ({ shoeId: item.shoeId._id, quantity: item.quantity }));
 
     cart.forEach(item => {
         const itemTotal = item.shoeId.price * item.quantity;
@@ -52,73 +53,48 @@ function displayCartItems(cart) {
     `;
     cartItemsContainer.innerHTML = html;
     
-    // Store total price for checkout
+    // Store total price and shoes for checkout
     sessionStorage.setItem('totalPrice', totalPrice.toFixed(2));
+    sessionStorage.setItem('shoes', JSON.stringify(shoes));
 }
 
 function initializePayPalButton() {
     paypal.Buttons({
-        createOrder: function () {
+        createOrder: async function () {
             const totalPrice = sessionStorage.getItem('totalPrice');
             if (!totalPrice) {
                 alert("Total price not found.");
                 return false;
             }
 
-            return fetch('http://localhost:3000/api/create-paypal-order', { 
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    totalAmount: totalPrice,
-                    shipping: getShippingDetails()
-                })
-            }).then(res => {
-                if (!res.ok) {
-                    throw new Error(`Server responded with status ${res.status}`);
+            try {
+                
+                const response = await fetch('/api/create-paypal-order', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ totalAmount: totalPrice,
+                        shipping: getShippingDetails() }) 
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
                 }
-                return res.json();
-            }).then(data => {
+
+                const data = await response.json();
                 if (data && data.orderID) {
                     return data.orderID;
                 } else {
                     throw new Error('Failed to create order');
                 }
-            }).catch(error => {
+            } catch (error) {
                 console.error('Error during createOrder:', error);
                 alert("Error creating order. Please try again.");
-            });
+            }
         },
-        onApprove: function (data) {
-            return fetch('http://localhost:3000/api/capture-paypal-order', { // גם כאן השתמש בכתובת מלאה
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    orderID: data.orderID
-                })
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            }).then(orderData => {
-                if (orderData.success) {
-                    alert('Purchase completed successfully!');
-                    window.location.href = '/confirmation.html';
-                } else {
-                    throw new Error('Failed to capture order');
-                }
-            }).catch(error => {
-                console.error('Error during onApprove:', error);
-                alert("Error capturing order. Please try again.");
-            });
-        }
     }).render('#paypal-button-container');
 }
-
 
 function getShippingDetails() {
     return {
