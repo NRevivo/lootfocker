@@ -8,6 +8,13 @@ class ProductComponent {
     }
 
     static createProductCard(product) {
+        // Check if stock exists and is a number
+        const stock = Number(product.stock);
+        const isOutOfStock = !isNaN(stock) && stock <= 0;
+        
+        // Log for debugging
+        console.log('Product:', product.name, 'Stock:', stock, 'Is out of stock:', isOutOfStock);
+    
         return `
             <div class="product-card" data-product-id="${product._id}">
                 <div class="product-image-container">
@@ -15,15 +22,20 @@ class ProductComponent {
                     ${product.images[1] ? 
                         `<img src="${product.images[1]}" alt="${product.name}" class="hover-image">` 
                         : ''}
+                    ${isOutOfStock ? 
+                        `<div class="stock-overlay">Out of Stock</div>` 
+                        : ''}
                 </div>
                 <div class="product-info">
                     <h3>${product.name}</h3>
+                    ${isOutOfStock ? 
+                        '<p class="out-of-stock-text">Out of Stock</p>' 
+                        : ''}
                     <p class="price">$${product.price.toFixed(2)}</p>
                 </div>
             </div>
         `;
     }
-
     static getModalHTML() {
         return `
             <div id="productModal" class="modal">
@@ -88,6 +100,53 @@ class ProductComponent {
             position: relative;
             overflow: hidden;
         }
+
+        .stock-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            z-index: 2;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            pointer-events: none; /* מאפשר ללחוץ "דרך" הטקסט */
+        }
+        .price-stock-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0.5rem 0;
+        }
+
+        .stock-badge {
+            background-color: #ff0000;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .price {
+            margin: 0 !important;
+            color: red;
+            font-weight: bold;
+        }
+        .out-of-stock-text {
+            color: #ff0000;
+            font-size: 0.875rem;
+            margin: -0.25rem 0 0.5rem 0;
+            font-weight: bold;
+        }
+
 
         .product-card:hover {
             transform: translateY(-0.3125rem);
@@ -446,7 +505,6 @@ class ProductComponent {
             .size-options {
                 grid-template-columns: repeat(3, 1fr);
             }
-        }
 
         `;
 
@@ -550,6 +608,33 @@ class ProductComponent {
     static initializeModalInteractions(product) {
         const modal = document.getElementById('productModal');
     
+        // ריסוט מלא של כל האלמנטים
+        const resetElements = () => {
+            const quantityInput = modal.querySelector('.quantity-input');
+            const decreaseBtn = modal.querySelector('.decrease');
+            const increaseBtn = modal.querySelector('.increase');
+            const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+    
+            // איפוס סגנונות
+            [quantityInput, decreaseBtn, increaseBtn].forEach(element => {
+                if (element) {
+                    element.disabled = false;
+                    element.style.opacity = '1';
+                    element.style.cursor = 'pointer';
+                }
+            });
+    
+            if (addToCartBtn) {
+                addToCartBtn.disabled = false;
+                addToCartBtn.style.backgroundColor = '#000';
+                addToCartBtn.style.cursor = 'pointer';
+                addToCartBtn.textContent = 'Add to Cart';
+            }
+        };
+    
+        // קודם כל מאפסים הכל
+        resetElements();
+    
         // Size selection
         const sizeOptions = modal.querySelector('.size-options');
         const newSizeOptions = sizeOptions.cloneNode(true);
@@ -570,93 +655,130 @@ class ProductComponent {
         const quantityInput = newQuantityControls.querySelector('.quantity-input');
         const decreaseBtn = newQuantityControls.querySelector('.decrease');
         const increaseBtn = newQuantityControls.querySelector('.increase');
+        const addToCartBtn = modal.querySelector('.add-to-cart-btn');
+        const newAddToCartBtn = addToCartBtn.cloneNode(true);
     
-        // Set min/max
-        quantityInput.min = 1;
-        quantityInput.max = product.stock;
-        quantityInput.value = 1;
-    
-        const updateQuantity = (newValue) => {
-            let value = Math.min(Math.max(1, newValue), product.stock);
-            quantityInput.value = value;
-            decreaseBtn.disabled = value <= 1;
-            increaseBtn.disabled = value >= product.stock;
-        };
-    
-        // Handle direct input
-        quantityInput.addEventListener('input', (e) => {
-            let newValue = parseInt(e.target.value) || 1;
-            updateQuantity(newValue);
-        });
-    
-        // Single event listener for decrease button
-        decreaseBtn.addEventListener('click', () => {
-            const currentValue = parseInt(quantityInput.value);
-            if (currentValue > 1) {
-                updateQuantity(currentValue - 1);
-            }
-        });
-    
-        // Single event listener for increase button
-        increaseBtn.addEventListener('click', () => {
-            const currentValue = parseInt(quantityInput.value);
-            if (currentValue < product.stock) {
-                updateQuantity(currentValue + 1);
-            }
-        });
-        // Add to cart button
-    const addToCartBtn = modal.querySelector('.add-to-cart-btn');
-    const newAddToCartBtn = addToCartBtn.cloneNode(true);
-    addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
-
-    newAddToCartBtn.addEventListener('click', async () => {
-        const selectedSize = newSizeOptions.querySelector('button.selected')?.dataset.size;
-        const quantity = parseInt(quantityInput.value);
-        const userId = sessionStorage.getItem('userId');
-
-        if (!userId) {
-            alert('Please log in to add items to cart');
-            return;
-        }
-
-        if (!selectedSize) {
-            alert('Please select size');
-            return;
-        }
-
-        if (quantity < 1 || quantity > product.stock) {
-            alert('Invalid quantity');
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/cart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    productId: product._id,
-                    size: selectedSize,
-                    quantity: quantity,
-                    userId: userId
-                }),
+        // בדיקת מלאי
+        if (product.stock <= 0) {
+            // אם אין מלאי, נשנה את הכפתור ונחסום את האפשרויות
+            newAddToCartBtn.textContent = 'Out of Stock';
+            newAddToCartBtn.disabled = true;
+            newAddToCartBtn.style.backgroundColor = '#cccccc';
+            newAddToCartBtn.style.cursor = 'not-allowed';
+            
+            // נחסום את בקרי הכמות
+            quantityInput.disabled = true;
+            decreaseBtn.disabled = true;
+            increaseBtn.disabled = true;
+            
+            // נוסיף סגנון מעומעם לבקרי הכמות
+            [quantityInput, decreaseBtn, increaseBtn].forEach(element => {
+                element.style.opacity = '0.5';
+                element.style.cursor = 'not-allowed';
             });
-
-            const data = await response.json();
-            if (data.success) {
-                window.CartUtilities.updateCartDisplay(data.cart);
-                modal.classList.remove('active');
-                alert('Product added to cart successfully!');
-            } else {
-                alert(data.message || 'Error adding to cart');
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Error adding to cart');
+        } else {
+            // אם יש מלאי, נגדיר את הערכים הרגילים
+            newAddToCartBtn.textContent = 'Add to Cart';
+            newAddToCartBtn.disabled = false;
+            newAddToCartBtn.style.backgroundColor = '#000';
+            newAddToCartBtn.style.cursor = 'pointer';
+            
+            // Set min/max for quantity
+            quantityInput.min = 1;
+            quantityInput.max = product.stock;
+            quantityInput.value = 1;
+            quantityInput.disabled = false;
+    
+            decreaseBtn.disabled = false;
+            increaseBtn.disabled = false;
+    
+            [quantityInput, decreaseBtn, increaseBtn].forEach(element => {
+                element.style.opacity = '1';
+                element.style.cursor = 'pointer';
+            });
+    
+            const updateQuantity = (newValue) => {
+                let value = Math.min(Math.max(1, newValue), product.stock);
+                quantityInput.value = value;
+                decreaseBtn.disabled = value <= 1;
+                increaseBtn.disabled = value >= product.stock;
+            };
+    
+            // Handle direct input
+            quantityInput.addEventListener('input', (e) => {
+                let newValue = parseInt(e.target.value) || 1;
+                updateQuantity(newValue);
+            });
+    
+            // Single event listener for decrease button
+            decreaseBtn.addEventListener('click', () => {
+                const currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    updateQuantity(currentValue - 1);
+                }
+            });
+    
+            // Single event listener for increase button
+            increaseBtn.addEventListener('click', () => {
+                const currentValue = parseInt(quantityInput.value);
+                if (currentValue < product.stock) {
+                    updateQuantity(currentValue + 1);
+                }
+            });
+    
+            // Add to cart functionality
+            newAddToCartBtn.addEventListener('click', async () => {
+                const selectedSize = newSizeOptions.querySelector('button.selected')?.dataset.size;
+                const quantity = parseInt(quantityInput.value);
+                const userId = sessionStorage.getItem('userId');
+    
+                if (!userId) {
+                    alert('Please log in to add items to cart');
+                    return;
+                }
+    
+                if (!selectedSize) {
+                    alert('Please select size');
+                    return;
+                }
+    
+                if (quantity < 1 || quantity > product.stock) {
+                    alert('Invalid quantity');
+                    return;
+                }
+    
+                try {
+                    const response = await fetch('/api/cart', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            productId: product._id,
+                            size: selectedSize,
+                            quantity: quantity,
+                            userId: userId
+                        }),
+                    });
+    
+                    const data = await response.json();
+                    if (data.success) {
+                        window.CartUtilities.updateCartDisplay(data.cart);
+                        modal.classList.remove('active');
+                        alert('Product added to cart successfully!');
+                    } else {
+                        alert(data.message || 'Error adding to cart');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Error adding to cart');
+                }
+            });
         }
-    });
-}
+    
+        addToCartBtn.parentNode.replaceChild(newAddToCartBtn, addToCartBtn);
+    }
+    
     
 
     static changeMainImage(thumbnailImg) {

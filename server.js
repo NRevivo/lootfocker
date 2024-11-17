@@ -18,6 +18,7 @@ const io = socketIo(server);
 
 // Connect to the database
 connectToDB().then(() => {
+
  // Set public directory as static
   app.use(express.static(path.join(__dirname, 'public')));
 
@@ -227,28 +228,23 @@ app.get('/api/orders/:userId', async (req, res) => {
         email,
         password,
         address,
-        paymentMethod
       } = req.body;
-
-      // Combine first and last name into full name
+  
       const fullName = `${firstName} ${lastName}`;
-
-      // Check if user already exists
+  
       const existingUser = await User.findOne({ email: email });
       if (existingUser) {
         return res.status(400).json({ message: 'User already exists' });
       }
-
-      // Create new user object
+  
       const newUser = new User({
         fullName,
         email,
         password,
         address,
-        paymentMethod,
         role: 'user'
       });
-
+  
       await newUser.save();
       res.status(201).json({ message: 'User registered successfully' });
     } catch (err) {
@@ -289,18 +285,42 @@ app.get('/api/orders/:userId', async (req, res) => {
   app.delete('/api/users/:id', async (req, res) => {
     try {
       const { id } = req.params;
-
-      const user = await User.findByIdAndDelete(id);
-
+  
+      // מצא את המשתמש לפני המחיקה
+      const user = await User.findById(id);
       if (!user) {
         return res.status(404).send('User not found');
       }
-
-      res.status(200).send('User deleted successfully');
+  
+      // החזר את המוצרים מהעגלה למלאי לפני מחיקת המשתמש
+      if (user.cart && user.cart.length > 0) {
+        // עבור על כל פריט בעגלה
+        for (const cartItem of user.cart) {
+          try {
+            // מצא את הנעל במערכת
+            const shoe = await Shoe.findById(cartItem.shoeId);
+            if (shoe) {
+              // החזר את הכמות למלאי
+              shoe.stock += cartItem.quantity;
+              await shoe.save();
+              console.log(`Restored ${cartItem.quantity} items to stock for shoe ${shoe._id}`);
+            }
+          } catch (error) {
+            console.error(`Error restoring stock for shoe ${cartItem.shoeId}:`, error);
+          }
+        }
+      }
+  
+      // מחק את המשתמש
+      await User.findByIdAndDelete(id);
+      
+      res.status(200).send('User and their cart items deleted successfully, stock restored');
     } catch (err) {
+      console.error('Error deleting user:', err);
       res.status(500).send('Server Error');
     }
   });
+  
 
   // Route to login
   app.post('/login', async (req, res) => {
@@ -420,7 +440,7 @@ app.get('/api/shoes/filter', async (req, res) => {
 
       // שינוי כאן - הוספת select כדי לוודא שכל השדות הנדרשים מוחזרים
       const shoes = await Shoe.find(filter)
-          .select('name brand price images sizes description')  // בחירת השדות הספציפיים שאנחנו רוצים
+          .select('name brand price images sizes description stock')  // בחירת השדות הספציפיים שאנחנו רוצים
           .lean()  // המרה לאובייקט JavaScript רגיל לביצועים טובים יותר
           .exec();
 
@@ -441,14 +461,21 @@ app.get('/api/shoes/filter', async (req, res) => {
 app.get('/api/shoes/latest', async (req, res) => {
   try {
       const latestShoes = await Shoe.find()
-          .sort({ addedDate: -1 }) // מיון לפי תאריך הוספה בסדר יורד
-          .limit(4);               // הגבלה ל-4 מוצרים אחרונים
+          .select('name brand price images description stock _id') // הוספנו _id
+          .sort({ addedDate: -1 }) // שינוי ל-addedDate
+          .limit(4);
+
+      if (!latestShoes || latestShoes.length === 0) {
+          return res.status(404).json({ message: 'No products found' });
+      }
+
       res.json(latestShoes);
   } catch (err) {
       console.error('Error fetching latest shoes:', err);
-      res.status(500).send('Server Error');
+      res.status(500).json({ message: 'Server Error' });
   }
 });
+
 
   // Route to get distinct brands
   app.get('/api/shoes/brands', async (req, res) => {
@@ -475,28 +502,28 @@ app.get('/api/shoes/latest', async (req, res) => {
   });
 
  // Routes for Shoes
-app.route('/api/shoes')
-.get(async (req, res) => { // Get all shoes or filter shoes
-  try {
-    const { category, brand, sizes, minPrice, maxPrice } = req.query;  // קבלת הפרמטרים מהבקשה
+ app.route('/api/shoes')
+ .get(async (req, res) => {
+     try {
+         const { category, brand, sizes, minPrice, maxPrice } = req.query;
 
-    let filter = {};
-    if (category) filter.category = category; // סינון לפי קטגוריה
-    if (brand) filter.brand = { $in: brand.split(',') }; // סינון לפי מותג
-    if (sizes) filter.sizes = { $in: sizes.split(',').map(Number) }; // סינון לפי מידות
-    if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice); // סינון לפי מחיר מינימלי
-      if (maxPrice) filter.price.$lte = Number(maxPrice); // סינון לפי מחיר מקסימלי
-    }
+         let filter = {};
+         if (category) filter.category = category;
+         if (brand) filter.brand = { $in: brand.split(',') };
+         if (sizes) filter.sizes = { $in: sizes.split(',').map(Number) };
+         if (minPrice || maxPrice) {
+             filter.price = {};
+             if (minPrice) filter.price.$gte = Number(minPrice);
+             if (maxPrice) filter.price.$lte = Number(maxPrice);
+         }
 
-    const shoes = await Shoe.find(filter);  // שליפת המוצרים מהמסד נתונים לפי הפילטרים
-    res.json(shoes);  // החזרת המוצרים כתגובה
-  } catch (err) {
-    console.error('Error fetching shoes:', err);
-    res.status(500).send('Internal Server Error');
-  }
-})
+         const shoes = await Shoe.find(filter).select('name brand price images sizes description stock');  // הוספת stock
+         res.json(shoes);
+     } catch (err) {
+         console.error('Error fetching shoes:', err);
+         res.status(500).send('Internal Server Error');
+     }
+ })
 .post(async (req, res) => { // Create a new shoe
   try {
     const { name, description, price, category, brand, sizes, color, stock, images } = req.body;
@@ -583,7 +610,6 @@ app.post("/api/cart", async (req, res) => {
   try {
       const { productId, size, quantity, userId } = req.body;
 
-      // וידוא שכל השדות הנדרשים קיימים
       if (!productId || !size || !quantity || !userId) {
           return res.status(400).json({ 
               success: false, 
@@ -591,16 +617,23 @@ app.post("/api/cart", async (req, res) => {
           });
       }
 
-      // בדיקה שהמוצר קיים
-      const product = await Shoe.findById(productId);
-      if (!product) {
+      // בדיקה שהמוצר קיים ויש מספיק מלאי
+      const shoe = await Shoe.findById(productId);
+      if (!shoe) {
           return res.status(404).json({ 
               success: false, 
               message: "Product not found" 
           });
       }
 
-      // בדיקה שהמשתמש קיים
+      // בדיקת מלאי
+      if (shoe.stock < quantity) {
+          return res.status(400).json({
+              success: false,
+              message: "Not enough stock available"
+          });
+      }
+
       const user = await User.findById(userId);
       if (!user) {
           return res.status(404).json({ 
@@ -609,13 +642,16 @@ app.post("/api/cart", async (req, res) => {
           });
       }
 
-      // בדיקה אם המוצר כבר קיים בעגלה
+      // עדכון המלאי
+      shoe.stock -= quantity;
+      await shoe.save();
+
+      // הוספה לעגלה - הקוד הקיים שלך
       const existingCartItem = user.cart.find(
           item => item.shoeId.toString() === productId && item.size === size
       );
 
       if (existingCartItem) {
-          // עדכון כמות אם המוצר כבר קיים
           await User.updateOne(
               { 
                   _id: userId, 
@@ -627,7 +663,6 @@ app.post("/api/cart", async (req, res) => {
               }
           );
       } else {
-          // הוספת מוצר חדש לעגלה
           await User.findByIdAndUpdate(
               userId,
               { 
@@ -642,7 +677,6 @@ app.post("/api/cart", async (req, res) => {
           );
       }
 
-      // שליפת העגלה המעודכנת עם פרטי המוצרים
       const updatedUser = await User.findById(userId).populate('cart.shoeId');
       
       res.json({ 
@@ -700,21 +734,26 @@ app.delete('/api/cart/:userId/:itemId', async (req, res) => {
           });
       }
 
-      // מוצאים את האינדקס של הפריט בעגלה
-      const itemIndex = user.cart.findIndex(item => item._id.toString() === itemId);
-      
-      if (itemIndex === -1) {
+      // מציאת הפריט בעגלה לפני הסרתו
+      const cartItem = user.cart.find(item => item._id.toString() === itemId);
+      if (!cartItem) {
           return res.status(404).json({
               success: false,
               message: "Item not found in cart"
           });
       }
 
-      // מסירים את הפריט מהעגלה
-      user.cart.splice(itemIndex, 1);
+      // עדכון המלאי - החזרת הכמות למלאי
+      const shoe = await Shoe.findById(cartItem.shoeId);
+      if (shoe) {
+          shoe.stock += cartItem.quantity;
+          await shoe.save();
+      }
+
+      // הסרת הפריט מהעגלה
+      user.cart = user.cart.filter(item => item._id.toString() !== itemId);
       await user.save();
 
-      // מחזירים את העגלה המעודכנת עם כל פרטי המוצרים
       const updatedUser = await User.findById(userId).populate('cart.shoeId');
       
       res.json({
@@ -727,6 +766,37 @@ app.delete('/api/cart/:userId/:itemId', async (req, res) => {
       res.status(500).json({
           success: false,
           message: "Error removing item from cart"
+      });
+  }
+});
+
+app.post('/api/cart/:userId/clean', async (req, res) => {
+  try {
+      const { userId } = req.params;
+      const { cart } = req.body;
+      
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({
+              success: false,
+              message: "User not found"
+          });
+      }
+
+      // עדכון העגלה עם הפריטים התקינים בלבד
+      user.cart = cart;
+      await user.save();
+
+      res.json({
+          success: true,
+          message: "Cart cleaned successfully",
+          cart: user.cart
+      });
+  } catch (error) {
+      console.error('Error cleaning cart:', error);
+      res.status(500).json({
+          success: false,
+          message: "Error cleaning cart"
       });
   }
 });

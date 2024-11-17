@@ -47,11 +47,6 @@ const userSchema = new mongoose.Schema({
     country: String,
     postalCode: String,
   },
-  paymentMethod: {
-    cardNumber: String,
-    expirationDate: String,
-    cvv: String,
-  },
   role: {
     type: String,
     enum: ['admin', 'user'],

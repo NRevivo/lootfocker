@@ -32,7 +32,7 @@ class HomePage {
         try {
             const response = await fetch('/api/shoes/latest');
             if (!response.ok) {
-                throw new Error('Failed to fetch latest products');
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const products = await response.json();
@@ -43,30 +43,28 @@ class HomePage {
                 return;
             }
 
-            // ניקוי הגריד הקיים
             productGrid.innerHTML = '';
 
             if (products && products.length > 0) {
-                // יצירת הכרטיסים
                 products.forEach(product => {
                     productGrid.innerHTML += ProductComponent.createProductCard(product);
                 });
-
-                // אתחול האינטראקציות
+                
+                // אתחול האינטראקציות לאחר יצירת הכרטיסים
                 ProductComponent.initializeProductCards();
             } else {
                 productGrid.innerHTML = '<p class="no-results">No products available at the moment.</p>';
             }
         } catch (error) {
-            console.error('Error loading products:', error);
+            console.error('Error loading latest products:', error);
             const productGrid = document.querySelector('.product-grid');
             if (productGrid) {
                 productGrid.innerHTML = '<p class="error-message">Error loading products. Please try again later.</p>';
             }
         }
     }
-
 }
+
     document.addEventListener('DOMContentLoaded', () => {
         new HomePage();
     });

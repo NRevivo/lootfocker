@@ -6,13 +6,16 @@ window.CartUtilities = {
         
         if (!cartItems) return;
 
+        // סינון פריטים שאינם קיימים במערכת
+        const validCart = cart.filter(item => item.shoeId != null);
+
         // עדכון מספר הפריטים בעגלה
         if (cartCount) {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalItems = validCart.reduce((sum, item) => sum + item.quantity, 0);
             cartCount.textContent = totalItems;
         }
 
-        if (!cart || cart.length === 0) {
+        if (!validCart || validCart.length === 0) {
             // אם העגלה ריקה, הצגת הודעה רלוונטית
             cartItems.innerHTML = `
                 <div class="empty-cart">
@@ -35,8 +38,11 @@ window.CartUtilities = {
         let html = '';
         let total = 0;
         
-        cart.forEach(item => {
+        validCart.forEach(item => {
             const shoe = item.shoeId;
+            // בדיקה נוספת שהנעל קיימת
+            if (!shoe) return;
+
             const itemTotal = shoe.price * item.quantity;
             total += itemTotal;
 
@@ -118,7 +124,25 @@ window.CartUtilities = {
             const data = await response.json();
             
             if (data.success) {
-                this.updateCartDisplay(data.cart);
+                // סינון פריטים לא תקינים לפני הצגת העגלה
+                const validCart = data.cart.filter(item => item.shoeId != null);
+                
+                // אם נמצאו פריטים לא תקינים, עדכן את העגלה בשרת
+                if (validCart.length !== data.cart.length) {
+                    const updateResponse = await fetch(`/api/cart/${userId}/clean`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ cart: validCart })
+                    });
+                    
+                    if (!updateResponse.ok) {
+                        console.error('Failed to clean cart on server');
+                    }
+                }
+                
+                this.updateCartDisplay(validCart);
             }
         } catch (error) {
             console.error('Error loading cart:', error);
@@ -126,7 +150,6 @@ window.CartUtilities = {
         }
     }
 };
-
 document.addEventListener('DOMContentLoaded', async function() {
     // טעינת ה-Header מהקובץ header.html
     async function loadHeader() {

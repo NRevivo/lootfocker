@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div class="shoe-details">
                                 <p class="shoe-name">${shoeData.name || 'שם לא זמין'}</p>
                                 <p class="shoe-quantity">כמות: ${shoe.quantity || 0}</p>
-                                <p class="shoe-price">מחיר: ₪${shoeData.price?.toFixed(2) || '0.00'}</p>
+                                <p class="shoe-price">מחיר: $${shoeData.price?.toFixed(2) || '0.00'}</p>
                             </div>
                         </div>
                     `;
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="order-date">${orderDate}</span>
                         <span class="status ${order.status}">${getStatusText(order.status)}</span>
                     </div>
-                    <p class="order-summary">סה"כ הזמנה: ₪${order.totalAmount?.toFixed(2) || '0.00'}</p>
+                    <p class="order-summary">סה"כ הזמנה: $${order.totalAmount?.toFixed(2) || '0.00'}</p>
                 </div>
                 <div class="order-content">
                     <div class="order-main">
@@ -109,10 +109,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function getStatusText(status) {
         const statusMap = {
-            'pending': 'ממתין לאישור',
-            'shipped': 'נשלח',
-            'delivered': 'נמסר',
-            'cancelled': 'בוטל'
+            'pending': 'pending',
+            'shipped': 'shipped',
+            'delivered': 'delivered',
+            'cancelled': 'cancelled'
         };
         return statusMap[status] || status;
     }
