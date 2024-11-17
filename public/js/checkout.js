@@ -66,42 +66,75 @@ function initializePayPalButton() {
                 alert("Total price not found.");
                 return false;
             }
-
+            const response = await fetch('/api/create-paypal-order', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    totalAmount: totalPrice,
+                    shipping: getShippingDetails()
+                })
+            });
+    
+            const data = await response.json();
+            return data.orderID;
+        },
+        onApprove: async function (data) {
+            // אסוף פרטי משלוח מהטופס
+            const shippingDetails = getShippingDetails();
+        
+            // הוסף לוג לפני שליחת הנתונים לשרת
+            console.log('Sending data to server:', {
+                orderID: data.orderID,
+                userId: sessionStorage.getItem('userId'),
+                shoes: JSON.parse(sessionStorage.getItem('shoes')),
+                totalAmount: sessionStorage.getItem('totalPrice'),
+                shipping: shippingDetails
+            });
+        
             try {
-                
-                const response = await fetch('/api/create-paypal-order', { 
+                // שלח את הבקשה לשרת
+                const response = await fetch('/api/capture-paypal-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ totalAmount: totalPrice,
-                        shipping: getShippingDetails() }) 
+                    body: JSON.stringify({
+                        orderID: data.orderID,
+                        userId: sessionStorage.getItem('userId'),
+                        shoes: JSON.parse(sessionStorage.getItem('shoes')),
+                        totalAmount: sessionStorage.getItem('totalPrice'),
+                        shipping: shippingDetails
+                    })
                 });
-                
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-
-                const data = await response.json();
-                if (data && data.orderID) {
-                    return data.orderID;
+        
+                const result = await response.json();
+        
+                if (result.success) {
+                    alert(`ההזמנה בוצעה בהצלחה! מספר ההזמנה שלך: ${data.orderID}`);
                 } else {
-                    throw new Error('Failed to create order');
+                    alert(`שגיאה באישור התשלום: ${result.error || 'Unknown error'}`);
                 }
             } catch (error) {
-                console.error('Error during createOrder:', error);
-                alert("Error creating order. Please try again.");
+                console.error('Error capturing PayPal order:', error);
+                alert("שגיאה בביצוע ההזמנה. אנא נסה שוב.");
             }
-        },
-    }).render('#paypal-button-container');
+        }
+        
+    }).render('#paypal-button-container');    
 }
 
 function getShippingDetails() {
-    return {
+    const shippingDetails = {
         fullName: document.getElementById('fullName').value,
         address: document.getElementById('address').value,
         city: document.getElementById('city').value,
         postalCode: document.getElementById('postalCode').value,
         phone: document.getElementById('phone').value
     };
+    console.log('Shipping details being sent:', shippingDetails);
+    return shippingDetails;
 }
+
+

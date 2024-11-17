@@ -832,7 +832,6 @@ async function getPayPalClient() {
 }
 
 // Endpoint to create a new PayPal order
-
 app.post('/api/create-paypal-order', async (req, res) => {
     const { totalAmount, shipping } = req.body;
     const request = new paypal.orders.OrdersCreateRequest();
@@ -868,34 +867,43 @@ app.post('/api/create-paypal-order', async (req, res) => {
 
 // Endpoint to capture a PayPal order and save it to MongoDB
 app.post('/api/capture-paypal-order', async (req, res) => {
-    const { orderID, userId, shoes, totalAmount, shipping } = req.body;
+  console.log('Request body:', req.body);
 
-    const request = new paypal.orders.OrdersCaptureRequest(orderID);
+  const { orderID, userId, shoes, totalAmount, shipping } = req.body;
+  const request = new paypal.orders.OrdersCaptureRequest(orderID);
 
-    try {
-        // Capture the PayPal order
-        const capture = await getPayPalClient().execute(request);
+  try {
+      // Capture the PayPal order
+      const client = await getPayPalClient();
+      const capture = await client.execute(request);
+      console.log('PayPal Capture Result:', capture.result);
 
-        // Save the order to MongoDB
-        const newOrder = new Order({
-            userId,
-            shoes,
-            totalAmount,
-            shippingAddress: {
-                street: shipping.address,
-                city: shipping.city,
-                country: 'US', // or another relevant country code
-                postalCode: shipping.postalCode
-            },
-            status: 'pending',  // or update based on capture result if needed
-            orderDate: new Date() // Assuming you want to set order date as current date
-        });
+      // Save the order to MongoDB
+      try {
+          const newOrder = new Order({
+              userId,
+              shoes,
+              totalAmount,
+              shippingAddress: {
+                  street: shipping.address,
+                  city: shipping.city,
+                  country: 'Israel',
+                  postalCode: shipping.postalCode
+              },
+              status: 'pending',
+              orderDate: new Date()
+          });
 
-        await newOrder.save();
+          await newOrder.save();
+          console.log('Order saved successfully:', newOrder);
 
-        res.json({ success: true, order: capture.result });
-    } catch (error) {
-        console.error('Error capturing PayPal order:', error);
-        res.status(500).json({ error: 'Failed to capture order' });
-    }
+          res.json({ success: true, order: capture.result });
+      } catch (dbError) {
+          console.error('Error saving order to MongoDB:', dbError);
+          res.status(500).json({ error: 'Failed to save order to database' });
+      }
+  } catch (error) {
+      console.error('Error capturing PayPal order:', error.message || error.response);
+      res.status(500).json({ error: 'Failed to capture order' });
+  }
 });
