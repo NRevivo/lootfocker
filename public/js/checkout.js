@@ -113,6 +113,12 @@ function initializePayPalButton() {
         
                 if (result.success) {
                     alert(`ההזמנה בוצעה בהצלחה! מספר ההזמנה שלך: ${data.orderID}`);
+                 
+                    // איפוס העגלה בצד הלקוח
+                    sessionStorage.removeItem('shoes');
+                    sessionStorage.removeItem('totalPrice');
+                    document.querySelector('.cart-items-list').innerHTML = '<p>Your cart is empty.</p>';
+                    
                 } else {
                     alert(`שגיאה באישור התשלום: ${result.error || 'Unknown error'}`);
                 }

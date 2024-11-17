@@ -897,6 +897,13 @@ app.post('/api/capture-paypal-order', async (req, res) => {
           await newOrder.save();
           console.log('Order saved successfully:', newOrder);
 
+           // Clear the user's cart
+           await User.updateOne(
+            { _id: userId },
+            { $set: { cart: [] } }
+        );
+        console.log('Cart cleared successfully for user:', userId);
+
           res.json({ success: true, order: capture.result });
       } catch (dbError) {
           console.error('Error saving order to MongoDB:', dbError);
