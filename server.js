@@ -178,30 +178,38 @@ app.get('/api/orders/:userId', async (req, res) => {
   // Route to get all orders
   app.get('/api/orders', async (req, res) => {
     try {
-      const orders = await Order.find();
-      res.json(orders);
+        const orders = await Order.find()
+            .populate('userId', 'email') // Populate email only
+            .sort({ orderDate: -1 });
+
+        res.json(orders);
     } catch (err) {
-      res.status(500).send('Server Error');
+        console.error('Error fetching orders:', err);
+        res.status(500).send('Server Error');
     }
-  });
+});
 
   // Route to update an existing order
   app.put('/api/orders/:id', async (req, res) => {
     try {
-      const { id } = req.params;
-      const updates = req.body;
+        const { id } = req.params;
+        const { status } = req.body;
 
-      const order = await Order.findByIdAndUpdate(id, updates, { new: true });
+        if (!['pending', 'shipped', 'delivered', 'cancelled'].includes(status)) {
+            return res.status(400).send('Invalid status');
+        }
 
-      if (!order) {
-        return res.status(404).send('Order not found');
-      }
+        const order = await Order.findByIdAndUpdate(id, { status }, { new: true });
 
-      res.status(200).send(order);
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        res.status(200).json(order);
     } catch (err) {
-      res.status(500).send('Server Error');
+        res.status(500).send('Server Error');
     }
-  });
+});
 
   // Route to delete an order
   app.delete('/api/orders/:id', async (req, res) => {

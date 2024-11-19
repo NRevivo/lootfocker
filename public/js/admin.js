@@ -69,18 +69,14 @@ async function loadShoes() {
         if (tbody) {
             tbody.innerHTML = shoes.map(shoe => `
                 <tr>
-                    <td>
-                       <img 
-    src="${shoe.images && shoe.images[0] ? shoe.images[0] : '/images/no-image.jpg'}" 
-    alt="${shoe.name}"
->
-                    </td>
-                    <td>${shoe._id}</td>
+                    <td><img src="${shoe.images?.[0] || '/images/no-image.jpg'}" alt="${shoe.name}" style="width: 50px; height: 50px;"></td>
+                    <td>${shoe._id || '-'}</td> <!-- הצגת ה-ID בעמודה הנכונה -->
+                    <td>${shoe.category || '-'}</td>
                     <td>${shoe.brand || '-'}</td>
-                    <td>${shoe.name}</td>
-                    <td>$${shoe.price}</td>
-                    <td>${shoe.sizes ? shoe.sizes.join(', ') : '-'}</td>
-                    <td>${shoe.stock}</td>
+                    <td>${shoe.name || '-'}</td>
+                    <td>$${shoe.price || '-'}</td>
+                    <td>${shoe.sizes?.join(', ') || '-'}</td>
+                    <td>${shoe.stock || '-'}</td>
                     <td>
                         <button class="btn btn-warning btn-sm" onclick="editShoe('${shoe._id}')">Edit</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteShoe('${shoe._id}')">Delete</button>
@@ -127,16 +123,23 @@ async function loadOrders() {
         const response = await fetch('/api/orders');
         if (!response.ok) throw new Error('Failed to load orders');
         const orders = await response.json();
-        
+
         const tbody = document.getElementById('ordersTableBody');
         if (tbody) {
             tbody.innerHTML = orders.map(order => `
                 <tr>
                     <td>${order._id}</td>
-                    <td>${order.userId}</td>
+                    <td>${order.userId?.email || '-'}</td>
                     <td>${new Date(order.orderDate).toLocaleDateString()}</td>
-                    <td>$${order.totalAmount}</td>
-                    <td>${order.status}</td>
+                    <td>$${order.totalAmount.toFixed(2)}</td>
+                    <td>
+                        <select class="select-status" onchange="updateOrderStatus('${order._id}', this.value)">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>Pending</option>
+                            <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="cancelled" ${order.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">Delete</button>
                     </td>
@@ -149,6 +152,24 @@ async function loadOrders() {
     }
 }
 
+async function updateOrderStatus(orderId, newStatus) {
+    try {
+        const response = await fetch(`/api/orders/${orderId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus }),
+        });
+
+        if (!response.ok) throw new Error('Failed to update order status');
+        alert('Order status updated successfully');
+        loadOrders(); // Reload orders
+    } catch (error) {
+        console.error('Error updating order status:', error);
+    }
+}
+
 async function loadGroupedOrders() {
     showLoading('groupedOrders');
     try {
@@ -157,15 +178,16 @@ async function loadGroupedOrders() {
         const orders = await response.json();
         
         const groupedOrders = orders.reduce((acc, order) => {
-            if (!acc[order.userId]) {
-                acc[order.userId] = {
-                    userId: order.userId,
+            const userEmail = order.userId?.email || 'Unknown'; // השתמש במייל במקום אובייקט
+            if (!acc[userEmail]) {
+                acc[userEmail] = {
+                    userEmail,
                     totalOrders: 0,
                     totalAmount: 0
                 };
             }
-            acc[order.userId].totalOrders++;
-            acc[order.userId].totalAmount += order.totalAmount;
+            acc[userEmail].totalOrders++;
+            acc[userEmail].totalAmount += order.totalAmount;
             return acc;
         }, {});
 
@@ -178,7 +200,7 @@ async function loadGroupedOrders() {
         if (tbody) {
             tbody.innerHTML = groupedArray.map(group => `
                 <tr>
-                    <td>${group.userId}</td>
+                    <td>${group.userEmail}</td>
                     <td>${group.totalOrders}</td>
                     <td>$${group.totalAmount.toFixed(2)}</td>
                     <td>$${group.averageOrder.toFixed(2)}</td>
@@ -190,7 +212,62 @@ async function loadGroupedOrders() {
         showError('groupedOrders', 'Failed to load grouped orders. Please try again.');
     }
 }
+function openEditShoeModal(shoeId) {
+    fetch(`/api/shoes/${shoeId}`)
+        .then(response => response.json())
+        .then(shoe => {
+            document.getElementById('editShoeId').value = shoe._id;
+            document.getElementById('editShoeName').value = shoe.name;
+            document.getElementById('editShoeDescription').value = shoe.description || '';
+            document.getElementById('editShoePrice').value = shoe.price;
+            document.getElementById('editShoeCategory').value = shoe.category || '';
+            document.getElementById('editShoeBrand').value = shoe.brand || '';
+            document.getElementById('editShoeSizes').value = shoe.sizes?.join(', ') || '';
+            document.getElementById('editShoeColors').value = shoe.colors?.join(', ') || '';
+            document.getElementById('editShoeStock').value = shoe.stock;
+            document.getElementById('editShoeImages').value = shoe.images?.join(', ') || '';
+            
+            const editShoeModal = new bootstrap.Modal(document.getElementById('editShoeModal'));
+            editShoeModal.show();
+        })
+        .catch(error => {
+            console.error('Error loading shoe details:', error);
+            alert('Failed to load shoe details. Please try again.');
+        });
+}
 
+function submitEditShoe() {
+    const shoeId = document.getElementById('editShoeId').value;
+
+    const updatedShoe = {
+        name: document.getElementById('editShoeName').value,
+        description: document.getElementById('editShoeDescription').value,
+        price: parseFloat(document.getElementById('editShoePrice').value),
+        category: document.getElementById('editShoeCategory').value,
+        brand: document.getElementById('editShoeBrand').value,
+        sizes: document.getElementById('editShoeSizes').value.split(',').map(size => size.trim()),
+        colors: document.getElementById('editShoeColors').value.split(',').map(color => color.trim()),
+        stock: parseInt(document.getElementById('editShoeStock').value, 10),
+        images: document.getElementById('editShoeImages').value.split(',').map(image => image.trim())
+    };
+
+    fetch(`/api/shoes/${shoeId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedShoe),
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Failed to update shoe');
+        alert('Shoe updated successfully!');
+        location.reload(); // רענון העמוד
+    })
+    .catch(error => {
+        console.error('Error updating shoe:', error);
+        alert('Failed to update shoe. Please try again.');
+    });
+}
 // Delete functions
 async function deleteShoe(id) {
     if (confirm('Are you sure you want to delete this shoe?')) {
@@ -378,12 +455,13 @@ function submitNewShoe() {
 }
 // פונקציה שנקראת כשלוחצים על כפתור Edit
 async function editShoe(id) {
+    console.log('Editing shoe with ID:', id); // בדוק מה ה-ID שמתקבל
     try {
         const response = await fetch(`/api/shoes/${id}`);
         if (!response.ok) throw new Error('Failed to load shoe');
         const shoe = await response.json();
         
-        // מילוי הטופס בנתונים הקיימים
+        // מילוי טופס
         document.getElementById('editShoeId').value = shoe._id;
         document.getElementById('editShoeName').value = shoe.name || '';
         document.getElementById('editShoeDescription').value = shoe.description || '';
@@ -391,7 +469,6 @@ async function editShoe(id) {
         document.getElementById('editShoeCategory').value = shoe.category || '';
         document.getElementById('editShoeBrand').value = shoe.brand || '';
         document.getElementById('editShoeSizes').value = shoe.sizes ? shoe.sizes.join(', ') : '';
-        document.getElementById('editShoeColor').value = shoe.color || '';
         document.getElementById('editShoeStock').value = shoe.stock || '';
         document.getElementById('editShoeImages').value = shoe.images ? shoe.images.join(', ') : '';
 
@@ -415,7 +492,7 @@ async function updateShoe() {
     const category = document.getElementById('editShoeCategory').value;
     const brand = document.getElementById('editShoeBrand').value;
     const sizesStr = document.getElementById('editShoeSizes').value;
-    const color = document.getElementById('editShoeColor').value;
+    const color = document.getElementById('editShoeColors').value;
     const stock = document.getElementById('editShoeStock').value;
     const imagesStr = document.getElementById('editShoeImages').value;
     
