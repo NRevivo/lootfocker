@@ -538,3 +538,25 @@ function initializeSearch() {
 
 // הוספת הפונקציה לאובייקט החלון
 window.initializeSearch = initializeSearch;
+
+
+//  מניעת גישה לעמוד admin.html לאחר חזרה אחורה
+document.addEventListener('DOMContentLoaded', function() {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+    const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+
+    // מאזין לאירוע חזרה אחורה (כמו כפתור חזרה בדפדפן)
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) {
+            // בדיקת הרשאות
+            const isLoggedIn = sessionStorage.getItem("isLoggedIn") === "true";
+            const isAdmin = sessionStorage.getItem("isAdmin") === "true";
+
+            // אם המשתמש אינו מחובר או שאינו אדמין
+            if (!isLoggedIn || !isAdmin) {
+                alert("Session expired. Redirecting to homepage.");
+                window.location.href = "/homepage.html";
+            }
+        }
+    });
+});
