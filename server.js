@@ -6,6 +6,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const app = express();
 const port = 3000;
+const bcrypt = require('bcrypt');
 
 
 app.use(express.json());
@@ -237,10 +238,14 @@ app.get('/api/orders/:userId', async (req, res) => {
         return res.status(400).json({ message: 'User already exists' });
       }
   
+      // הצפנת הסיסמה
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+  
       const newUser = new User({
         fullName,
         email,
-        password,
+        password: hashedPassword, // שים לב שהסיסמה המוצפנת נשמרת כאן
         address,
         role: 'user'
       });
@@ -324,35 +329,38 @@ app.get('/api/orders/:userId', async (req, res) => {
 
   // Route to login
   app.post('/login', async (req, res) => {
-    try {
-        if (!req.body.email || !req.body.password) {
-            return res.status(400).send({ message: "Email and password are required" });
-        }
-
-        const check = await User.findOne({ email: req.body.email });
-
-        if (!check) {
-            return res.status(404).send({ message: "User not found" });
-        }
-
-        if (req.body.password === check.password) {
-            const role = check.role === 'admin' ? 'admin' : 'user';
-            const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
-
-            res.status(200).json({ 
-                message: 'Login successful', 
-                role,
-                userId: check._id,
-                fullName: check.fullName, // הוספנו את השם המלא
-                redirectUrl 
-            });
-        } else {
-            res.status(401).send({ message: "Incorrect password" });
-        }
-    } catch (e) {
-        console.error("Login error:", e);
-        res.status(500).send({ message: "Server error occurred" });
+  try {
+    if (!req.body.email || !req.body.password) {
+      return res.status(400).send({ message: "Email and password are required" });
     }
+
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    // השוואת הסיסמה
+    const match = await bcrypt.compare(req.body.password, user.password);
+
+    if (match) {
+      const role = user.role === 'admin' ? 'admin' : 'user';
+      const redirectUrl = role === 'admin' ? '/admin.html' : '/homepage.html';
+
+      res.status(200).json({
+        message: 'Login successful',
+        role,
+        userId: user._id,
+        fullName: user.fullName,
+        redirectUrl
+      });
+    } else {
+      res.status(401).send({ message: "Incorrect password" });
+    }
+  } catch (e) {
+    console.error("Login error:", e);
+    res.status(500).send({ message: "Server error occurred" });
+  }
 });
 
 // Route to filter shoes
