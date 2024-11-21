@@ -474,20 +474,20 @@ function submitNewShoe() {
 
     // Create shoe object exactly matching the schema
     const shoeData = {
-        name,                    // required
-        description,            // optional
-        price: Number(price),   // required
-        category,               // optional
-        brand,                  // optional
-        sizes,                  // optional array
-        colors,                // optional array
-        stock: Number(stock),  // required
-        images                 // optional array
+        name,
+        description,
+        price: Number(price),
+        category,
+        brand,
+        sizes,
+        colors,
+        stock: Number(stock),
+        images
     };
 
     // Validate required fields
     if (!shoeData.name || !shoeData.price || !shoeData.stock) {
-        alert('Name, price and stock are required fields');
+        alert('Name, price, and stock are required fields.');
         return;
     }
 
@@ -499,25 +499,27 @@ function submitNewShoe() {
         },
         body: JSON.stringify(shoeData)
     })
-    .then(response => {
-        if (!response.ok) throw new Error('Failed to add shoe');
-        return response.json();
-    })
-    .then(() => {
-        // Close modal
-        const modal = bootstrap.Modal.getInstance( document.getElementById('addAdminShoeModal'));
-        modal.hide();
-        
-        // Clear form
-        document.getElementById('addShoeForm').reset();
-        
-        // Reload shoes table
-        loadShoes();
-    })
-    .catch(error => {
-        console.error('Error adding shoe:', error);
-        alert('Failed to add shoe. Please try again.');
-    });
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to add shoe');
+            return response.json();
+        })
+        .then(() => {
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addShoeModal'));
+            modal.hide();
+
+            // Clear form
+            document.getElementById('addShoeForm').reset();
+            alert('shoe added successfully!');
+
+
+            // Reload shoes table
+            loadShoes();
+        })
+        .catch(error => {
+            console.error('Error adding shoe:', error);
+            alert('Failed to add shoe. Please try again.');
+        });
 }
 // פונקציה שנקראת כשלוחצים על כפתור Edit
 async function editShoe(id) {

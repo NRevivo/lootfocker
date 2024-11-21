@@ -140,7 +140,7 @@
         </div>
 
         <!-- Add Shoe Modal -->
-        <div class="modal fade admin-modal" id="addShoeModal" tabindex="-1">
+        <div class="modal fade admin-modal" id="addShoeModal" tabindex="-1" aria-labelledby="addShoeModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered admin-modal-dialog">
                 <div class="modal-content admin-modal-content">
                     <div class="modal-header admin-modal-header">
@@ -186,9 +186,10 @@
                                 <input type="text" class="form-control" id="shoeImages" placeholder="url1.jpg, url2.jpg">
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer admin-modal-footer">                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="submitNewShoe()">Add Shoe</button>
+                        <div class="modal-footer admin-modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" onclick="submitNewShoe()">Add Shoe</button>
+                        </div>
                     </div>
                 </div>
             </div>
