@@ -607,7 +607,36 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
+app.get('/api/order/:orderId', async (req, res) => {
+  try {
+      const { orderId } = req.params;
 
+      if (!orderId) {
+          return res.status(400).json({ message: 'Order ID is required' });
+      }
+
+      // חיפוש ההזמנה עם חיבור לנתוני המשתמש והמוצרים
+      const order = await Order.findById(orderId)
+          .populate('userId', 'email fullName') // מחבר את המידע של המשתמש
+          .populate({
+              path: 'shoes.shoeId',
+              model: 'Shoe',
+              select: 'name price images brand category', // שדות רלוונטיים מהמוצר
+          });
+
+      if (!order) {
+          return res.status(404).json({ message: 'Order not found' });
+      }
+
+      res.status(200).json(order); // מחזיר את פרטי ההזמנה
+  } catch (err) {
+      console.error('Error fetching order:', err);
+      res.status(500).json({
+          message: 'Server Error',
+          error: err.message,
+      });
+  }
+});
 // Route to get a specific shoe by ID
 app.get('/api/shoes/:id', async (req, res) => {
   try {

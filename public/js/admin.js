@@ -143,6 +143,9 @@ async function loadOrders() {
                     <td>
                         <button class="btn btn-danger btn-sm" onclick="deleteOrder('${order._id}')">Delete</button>
                     </td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="viewOrderProducts('${order._id}')">View Products</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -151,6 +154,8 @@ async function loadOrders() {
         showError('orders', 'Failed to load orders. Please try again.');
     }
 }
+
+
 
 async function updateOrderStatus(orderId, newStatus) {
     try {
@@ -212,6 +217,58 @@ async function loadGroupedOrders() {
         showError('groupedOrders', 'Failed to load grouped orders. Please try again.');
     }
 }
+function viewOrderProducts(orderId) {
+    fetch(`/api/order/${orderId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch order');
+            return response.json();
+        })
+        .then(order => {
+            if (!order || !Array.isArray(order.shoes)) {
+                throw new Error('Invalid order data');
+            }
+
+            const productsList = order.shoes.map(item => `
+                <li class="list-group-item d-flex align-items-center">
+                    <img src="${item.shoeId.images?.[0] || '/images/no-image.jpg'}" 
+                         alt="${item.shoeId.name}" 
+                         class="me-3"
+                         style="width:50px;height:50px;object-fit:cover">
+                    <div class="flex-grow-1">
+                        <h6 class="mb-0">${item.shoeId.name || 'Unknown Product'}</h6>
+                        <small class="text-muted">
+                            Brand: ${item.shoeId.brand || '-'} | 
+                            Category: ${item.shoeId.category || '-'}
+                        </small>
+                        <div>
+                            Quantity: ${item.quantity || 0} |
+                            Price: $${item.shoeId.price?.toFixed(2) || '0.00'}
+                        </div>
+                    </div>
+                </li>
+            `).join('');
+
+            const modalBody = document.getElementById('orderProductsModalBody');
+            if (!modalBody) {
+                console.error('Modal body element not found.');
+                alert('Failed to display order products. Please try again later.');
+                return;
+            }
+
+            modalBody.innerHTML = `
+                <ul class="list-group list-group-flush">
+                    ${productsList}
+                </ul>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('orderProductsModal'));
+            modal.show();
+        })
+        .catch(error => {
+            console.error('Error fetching order products:', error);
+            alert('Failed to fetch products. Please try again.');
+        });
+}
 function openEditShoeModal(shoeId) {
     fetch(`/api/shoes/${shoeId}`)
         .then(response => response.json())
@@ -227,7 +284,7 @@ function openEditShoeModal(shoeId) {
             document.getElementById('editShoeStock').value = shoe.stock;
             document.getElementById('editShoeImages').value = shoe.images?.join(', ') || '';
             
-            const editShoeModal = new bootstrap.Modal(document.getElementById('editShoeModal'));
+            const editShoeModal = new bootstrap.Modal( document.getElementById('editShoeModal'));
             editShoeModal.show();
         })
         .catch(error => {
@@ -261,7 +318,16 @@ function submitEditShoe() {
     .then(response => {
         if (!response.ok) throw new Error('Failed to update shoe');
         alert('Shoe updated successfully!');
-        location.reload(); // רענון העמוד
+
+        // כאן נקבל את המופע של המודאל ונחביא אותו
+        const modalElement = document.getElementById('editShoeModal');
+        const editShoeModal = bootstrap.Modal.getInstance(modalElement);
+        if (editShoeModal) {
+            editShoeModal.hide();
+        }
+
+        // רענון הטבלה
+        loadShoes();
     })
     .catch(error => {
         console.error('Error updating shoe:', error);
@@ -385,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function openAddShoeModal() {
-    const modal = new bootstrap.Modal(document.getElementById('addShoeModal'));
+    const modal = new bootstrap.Modal( document.getElementById('addShoeModal'));
     modal.show();
 }
 
@@ -439,7 +505,7 @@ function submitNewShoe() {
     })
     .then(() => {
         // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addShoeModal'));
+        const modal = bootstrap.Modal.getInstance( document.getElementById('addAdminShoeModal'));
         modal.hide();
         
         // Clear form
@@ -473,7 +539,7 @@ async function editShoe(id) {
         document.getElementById('editShoeImages').value = shoe.images ? shoe.images.join(', ') : '';
 
         // פתיחת המודל
-        const modal = new bootstrap.Modal(document.getElementById('editShoeModal'));
+        const modal = new bootstrap.Modal( document.getElementById('editShoeModal'));
         modal.show();
     } catch (error) {
         console.error('Error loading shoe details:', error);
@@ -532,7 +598,7 @@ async function updateShoe() {
         if (!response.ok) throw new Error('Failed to update shoe');
         
         // סגירת המודל
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editShoeModal'));
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editAdminShoeModal'));
         modal.hide();
         
         // טעינה מחדש של הטבלה

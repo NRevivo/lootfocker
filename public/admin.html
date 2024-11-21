@@ -105,6 +105,7 @@
                             <th>Total</th>
                             <th>Status</th>
                             <th>Actions</th>
+                            <th>View Products</th>
                         </tr>
                     </thead>
                     <tbody id="ordersTableBody">
@@ -139,14 +140,14 @@
         </div>
 
         <!-- Add Shoe Modal -->
-        <div class="modal fade" id="addShoeModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
+        <div class="modal fade admin-modal" id="addShoeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered admin-modal-dialog">
+                <div class="modal-content admin-modal-content">
+                    <div class="modal-header admin-modal-header">
                         <h5 class="modal-title">Add New Shoe</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body admin-modal-body">
                         <form id="addShoeForm">
                             <div class="mb-3">
                                 <label class="form-label">Name</label>
@@ -186,8 +187,7 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="modal-footer admin-modal-footer">                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="button" class="btn btn-primary" onclick="submitNewShoe()">Add Shoe</button>
                     </div>
                 </div>
@@ -195,14 +195,14 @@
         </div>
 
         <!-- Edit Shoe Modal -->
-        <div class="modal fade" id="editShoeModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
+        <div class="modal fade admin-modal" id="editShoeModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered admin-modal-dialog">
+                <div class="modal-content admin-modal-content">
+                    <div class="modal-header admin-modal-header">
                         <h5 class="modal-title">Edit Shoe</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body admin-modal-body">
                         <form id="editShoeForm">
                             <input type="hidden" id="editShoeId">
                             <div class="mb-3">
@@ -243,13 +243,32 @@
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer admin-modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="updateShoe()">Save Changes</button>
+                <button type="button" class="btn btn-primary" onclick="submitEditShoe()">Save Changes</button>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Order Products Modal -->
+        <div class="modal fade admin-modal" id="orderProductsModal" tabindex="-1" aria-labelledby="orderProductsModalLabel" aria-hidden="true">
+            <div class="modal-dialog admin-modal-dialog">
+                <div class="modal-content admin-modal-content">
+                    <div class="modal-header admin-modal-header">
+                        <h5 class="modal-title" id="orderProductsModalLabel">Order Products</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body admin-modal-body" id="orderProductsModalBody">
+                        <!-- כאן התוכן ייטען דינמית על ידי viewOrderProducts -->
+                    </div>
+                    <div class="modal-footer admin-modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- לשונית תחתונה -->
