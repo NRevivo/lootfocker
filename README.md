@@ -82,6 +82,10 @@ DB_MONGODB=mongodb+srv://<your-db-uri>
 ```
 
 > ❗ Never commit `.env` files to version control.
+>
+> 🔐 Note: This project uses a secure `.env` file which is not included in the public repository. Please refer to `.env.example` for the required environment variables.
+>
+> This file contains required credentials such as MongoDB URI and PayPal API keys.
 
 ---
 
